@@ -1,4 +1,18 @@
-# DeltaStores
+
+# Store System
+
+Store-Inventory will help the business in tracking the inventory movements in the warehouse by item, serial number. An Inventory/Store Management Solution is extremely critical to ensure smooth running of your retail business. An Inventory/Store Management Solution should be adaptable and secure to convey the right client service. These systems must be driven by access to real-time client data. At exactly that point can retailers convey customized offers and services that are up to the moment and targeted to each individual.
+
+
+## Features
+
+- More than 25 pages
+- Single page application
+- Lazy loading content
+- Responsive Design
+- Real time chat & notification
+- Multiple language
+
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.3.3.
 
