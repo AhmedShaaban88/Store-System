@@ -1,0 +1,448 @@
+<div class="jumbotron jumbotron-fluid">
+
+  <div class="page-container">
+    <div class="row">
+      <div class="col-sm-8">
+        <h4 class="text-store-lang">المخازن</h4>
+
+      </div>
+      <div class="col-sm-4 text-store-lang-inverse">
+
+        <button type="button" class="btn text-white btn-sm" data-toggle="modal" data-target="#add-stock" (click)="loadAllPlaces()"><span><i class="fa fa-plus"></i> </span> اضافه مخزن </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="container-fluid filter-container p-3">
+  <p class="text-muted">
+    <span class="small"> قم بالبحث للحصول علي عدد معين من النتائج او الضغط علي اضافه مخزن لاضافه مخزن جديد</span><br>
+  </p>
+
+  <form (keydown.enter)="$event.preventDefault()" [formGroup]="searchItemForm" id="searchItemForm" (ngSubmit)="searchItemSubmit()">
+
+  <div class='row'>
+    <div class='col-md-6 search-container'>
+      <div class='search-box'>
+          <input class='form-control' formControlName="searchKeyword" placeholder='كلمه البحث هنا' type='text'>
+          <button class='btn btn-link search-btn'>
+            <i class='fa fa-search'></i>
+          </button>
+
+
+      </div>
+    </div>
+    <div class='col-md-6 search-container'>
+
+      <angular2-multiselect  id="stockId"  *ngIf="stockTypes" [data]="stockTypes" [settings]="stockSetting" formControlName="stockId">
+        <c-item>
+          <ng-template let-item="item">
+            <label>{{item.label}}</label>
+          </ng-template>
+
+        </c-item>
+      </angular2-multiselect>
+
+    </div>
+  </div>
+  <div class="row mt-2">
+    <div class='col-md-6 search-container'>
+      <angular2-multiselect [loading] = "loadingFrom" (onScrollToEnd)="loadMorePlacesSearch($event)"  id="placeId"  *ngIf="placesSearch" [data]="placesSearch" [settings]="placeSetting" formControlName="placeId">
+        <c-search>
+          <ng-template>
+            <input type="text" (keyup)="onSearch($event)" [placeholder]="translate.currentLang === 'ar' ?  'كلمه البحث' : 'Search'"/>
+          </ng-template>
+        </c-search>
+        <c-item>
+          <ng-template let-item="item">
+            <label>{{item.place}}</label>
+          </ng-template>
+
+        </c-item>
+      </angular2-multiselect>
+
+    </div>
+    <div class='col-md-6 search-container'>
+      <angular2-multiselect  id="activeStatus"  [data]="translate.currentLang === 'ar' ? activationStatus : activationStatusEn" [settings]="activeSetting" formControlName="activeStatus">
+        <c-item>
+          <ng-template let-item="item">
+            <label>{{item.label}}</label>
+          </ng-template>
+
+        </c-item>
+      </angular2-multiselect>
+
+    </div>
+  </div>
+  <div class="row mt-2">
+    <div class="col-sm-12 text-center">
+
+      <button type="submit" form="searchItemForm" class="btn btn-success">
+        <i class='fa fa-search'></i>
+        بحث
+      </button>
+    </div>
+  </div>
+  </form>
+  </div>
+
+<div class="container ">
+  <div class="row">
+    <div class="table-responsive data-table">
+      <table class="table table-bordered table-sm table-hover">
+        <caption>المخازن</caption>
+        <thead>
+        <tr>
+          <th scope="col" >
+            <span>
+              <i class="fa"></i>
+            </span>
+            المسلسل</th>
+          <th scope="col" >
+            <span>
+              <i class="fa"></i>
+            </span>
+
+           الكود
+          </th>
+          <th scope="col"  class="sortable"  (click)="sortCol='Ar';sort($event.target);">
+            <span>
+              <i class="fa"></i>
+            </span>
+           اسم المخزن </th>
+          <th scope="col"  class="sortable" (click)="sortCol='En';sort($event.target);">
+            <span>
+              <i class="fa"></i>
+            </span>
+           اسم المخزن باللغه الانجليزيه</th>
+          <th scope="col" >
+            <span>
+              <i class="fa"></i>
+            </span>
+          مكان المخزن</th>
+          <th scope="col">
+            <span>
+              <i class="fa"></i>
+            </span>
+          نوع المخزن</th>
+          <th scope="col">
+            الاجراءات</th>
+        </tr>
+        </thead>
+        <ng-container *ngIf="stocks">
+
+        <tbody>
+        <tr *ngFor="let item of stocks.m_Item1;let i = index" [ngClass]="!item.StockIsActive ? 'bg-secondary' : ''">
+          <th scope="row">{{i+1}}</th>
+          <td>{{item.StockId}}</td>
+          <td>{{item.StockNameAr}}</td>
+          <td>{{item.StockNameEn}}</td>
+          <td><p [tooltip]="item.place">{{item.place}}</p></td>
+          <td>{{translate.currentLang === 'ar' ? item.StockTypesNameAr : item.StockTypesNameEn}}</td>
+          <td>
+            <div class="dropdown">
+              <button class="btn dropdown-toggle" type="button" id="more-options" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-ellipsis-h"></i>
+                <i class="fa fa-caret-down" [ngClass]="translate.currentLang ==='ar' ? 'mr-1' : 'ml-1'"></i>
+              </button>
+
+              <div class="dropdown-menu text-store-lang" (click)="stopClicking($event)" aria-labelledby="more-options">
+                <button type="button" class="btn btn-sm text-primary dropdown-item" data-toggle="modal" data-target="#update-item" (click)="updateForm(item, i)">
+                  <i class="fa fa-pencil"></i>
+
+                  {{"tables.edit" | translate}}
+
+                </button>
+                <button type="button" class="btn btn-sm text-danger dropdown-item" data-toggle="modal" data-target="#delete-item" (click)="selectedItem= item">
+                  <i class="fa fa-trash"></i>
+
+                  {{"tables.delete" | translate}}
+                </button>
+
+                <div class="dropdown-divider"></div>
+                <div class="custom-control custom-switch">
+                  <input type="checkbox" class="custom-control-input" [checked]="item.StockIsActive" [id]="i" (change)="changeCheckBox($event.target, item)">
+                  <label class="custom-control-label text-muted" [htmlFor]="i">{{translate.currentLang === 'ar' ? (item.StockIsActive ? 'تمكين' : 'تعطيل') : (item.StockIsActive ? 'Disable' : 'Active')}}</label>
+                </div>
+              </div>
+            </div>
+          </td>
+
+
+        </tr>
+
+
+        </tbody>
+          <tfoot class="bg-white" *ngIf="stocks?.m_Item1.length > 0">
+          <tr>
+            <td colspan="8">              {{"tables.from" | translate}}
+              1               {{"tables.to" | translate}}
+              {{stocks.m_Item1.length}}               {{"tables.from" | translate}}
+              {{stocks.m_Item2}}</td>
+          </tr>
+          </tfoot>
+        </ng-container>
+      </table>
+    </div>
+  </div>
+</div>
+<div class="d-flex justify-content-center" *ngIf="!stocks || spinnerMoreData">
+  <div class="spinner-border" role="status">
+    <span class="sr-only">Loading...</span>
+  </div>
+</div>
+<div class="d-flex justify-content-center" *ngIf="stocks?.m_Item1.length === 0">
+  <div>
+    <h6 class="text-danger">{{"tables.no-data" | translate}}</h6>
+  </div>
+</div>
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="add-stock" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">اضافه مخزن</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form (keydown.enter)="$event.preventDefault()" [formGroup]="addItemForm" id="addItemForm" (ngSubmit)="addItemSubmit()">
+          <div class="form-row">
+
+            <div class="form-group col-md-6">
+              <label for="name-ar" class="text-muted">الاسم بالعربي
+                <span class="text-error">*</span>
+              </label>
+              <input type="text" class="form-control" formControlName="StockNameAr" id="name-ar" placeholder="الاسم باللغه العربيه">
+              <span class="text-error" *ngIf="addItemForm.get('StockNameAr').touched && addItemForm.get('StockNameAr').invalid">الاسم باللغه العربيه مطلوب</span>
+
+            </div>
+            <div class="form-group col-md-6">
+              <label for="name-en" class="text-muted" >الاسم بالانجليزي
+                <span class="text-error">*</span>
+              </label>
+              <input type="text" class="form-control" id="name-en" formControlName="StockNameEn" placeholder="الاسم باللغه الانجليزيه">
+              <span class="text-error" *ngIf="addItemForm.get('StockNameEn').touched && addItemForm.get('StockNameEn').invalid">الاسم باللغه الانجليزيه مطلوب</span>
+
+            </div>
+          </div>
+            <div class="row">
+              <div class="form-group col-sm-12">
+                <label class="text-muted">الكليه
+                  <span class="text-error">*</span>
+                </label>
+                <angular2-multiselect  id="PlaceId_FK"  *ngIf="places" [data]="places" (keyup.Tab)="focusPlaceAdd($event)" (onOpen)="checkPlaceValueAdd(addItemForm.get('PlaceId_FK'))" (onSelect)="changeFaculty(addItemForm.get('PlaceId_FK').value[0].value)" [settings]="dropdownSettings" formControlName="PlaceId_FK">
+                  <c-item>
+                    <ng-template let-item="item">
+                      <label>{{item.label}}</label>
+                    </ng-template>
+
+                  </c-item>
+                </angular2-multiselect>
+                <span class="text-error" *ngIf="addItemForm.get('PlaceId_FK')?.errors !== null && addItemForm.get('PlaceId_FK')?.errors === 'empty'">اسم الكليه مطلوبه</span>
+
+              </div>
+
+              </div>
+            <div class="row">
+              <div class="form-group col-sm-6">
+                <label class="text-muted">الدور
+                  <span class="text-error">*</span>
+                </label>
+                <angular2-multiselect  id="FloorId_FK"  *ngIf="floors" [data]="floors" (keyup.Tab)="focusFloorAdd($event)" (onOpen)="checkFloorValueAdd(addItemForm.get('FloorId_FK'))" (onSelect)="changeFloor(addItemForm.get('FloorId_FK').value[0].value)" [settings]="dropdownSettings" formControlName="FloorId_FK">
+                  <c-item>
+                    <ng-template let-item="item">
+                      <label>{{item.label}}</label>
+                    </ng-template>
+
+                  </c-item>
+                </angular2-multiselect>
+                <span class="text-error" *ngIf="addItemForm.get('FloorId_FK')?.errors !== null && addItemForm.get('FloorId_FK')?.errors === 'empty'">الدور مطلوب</span>
+              </div>
+              <div class="form-group col-sm-6">
+                <label class="text-muted">الغرفه
+                  <span class="text-error">*</span>
+
+                </label>
+                <angular2-multiselect  id="OfficeId_FK"  *ngIf="offices" [data]="offices" (keyup.Tab)="focusOfficeAdd($event)" (onOpen)="checkOfficeValueAdd(addItemForm.get('OfficeId_FK'))" [settings]="dropdownSettings" formControlName="OfficeId_FK">
+                  <c-item>
+                    <ng-template let-item="item">
+                      <label>{{item.label}}</label>
+                    </ng-template>
+
+                  </c-item>
+                </angular2-multiselect>
+                <span class="text-error" *ngIf="addItemForm.get('OfficeId_FK')?.errors !== null && addItemForm.get('OfficeId_FK')?.errors === 'empty'">الغرفه مطلوب</span>
+              </div>
+            </div>
+          <div class="form-group">
+            <label class="text-muted">نوع المخزن
+              <span class="text-error">*</span>
+            </label>
+            <angular2-multiselect  id="StockTypeId_FK"  *ngIf="stockTypes" [data]="stockTypes" (keyup.Tab)="focusStockAdd($event)" (onOpen)="checkStockValueAdd(addItemForm.get('StockTypeId_FK'))" (focus)="checkStockValueAdd(addItemForm.get('StockTypeId_FK'))" [settings]="dropdownSettings" formControlName="StockTypeId_FK">
+              <c-item>
+                <ng-template let-item="item">
+                  <label>{{item.label}}</label>
+                </ng-template>
+
+              </c-item>
+            </angular2-multiselect>
+            <span class="text-error" *ngIf="addItemForm.get('StockTypeId_FK')?.errors !== null && addItemForm.get('StockTypeId_FK')?.errors === 'empty'">نوع المخزن مطلوب</span>
+          </div>
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" form="addItemForm" class="btn btn-success btn-sm" [disabled]="addItemForm.invalid">حفظ</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">اغلاق</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="update-item" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">تعديل مخزن</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form (keydown.enter)="$event.preventDefault()" [formGroup]="updateItemForm" id="updateItemForm" (ngSubmit)="updateItemSubmit()">
+          <div class="form-row">
+
+            <div class="form-group col-md-6">
+              <label for="name-ar" class="text-muted">الاسم بالعربي
+                <span class="text-error">*</span>
+              </label>
+              <input type="text" class="form-control" formControlName="StockNameAr" id="name-ar-edit" placeholder="الاسم باللغه العربيه">
+              <span class="text-error" *ngIf="updateItemForm.get('StockNameAr').touched && updateItemForm.get('StockNameAr').invalid">الاسم باللغه العربيه مطلوب</span>
+
+            </div>
+            <div class="form-group col-md-6">
+              <label for="name-en" class="text-muted" >الاسم بالانجليزي
+                <span class="text-error">*</span>
+              </label>
+              <input type="text" class="form-control" id="name-en-edit" formControlName="StockNameEn" placeholder="الاسم باللغه الانجليزيه">
+              <span class="text-error" *ngIf="updateItemForm.get('StockNameEn').touched && updateItemForm.get('StockNameEn').invalid">الاسم باللغه الانجليزيه مطلوب</span>
+
+            </div>
+          </div>
+            <div class="row">
+              <div class="form-group col-sm-12">
+                <label class="text-muted">الكليه
+                  <span class="text-error">*</span>
+                </label>
+                <angular2-multiselect [(ngModel)]="currentEditablePlace"  id="PlaceId_FK-edit"  *ngIf="places" [data]="places" (keyup.Tab)="focusPlaceUpdate($event)" (onOpen)="checkPlaceValueUpdate(updateItemForm.get('PlaceId_FK'))" (onSelect)="changeFacultyEditMode(updateItemForm.get('PlaceId_FK').value[0].value)" [settings]="dropdownSettings" formControlName="PlaceId_FK">
+                  <c-item>
+                    <ng-template let-item="item">
+                      <label>{{item.label}}</label>
+                    </ng-template>
+
+                  </c-item>
+                </angular2-multiselect>
+                <span class="text-error" *ngIf="updateItemForm.get('PlaceId_FK')?.errors !== null && updateItemForm.get('PlaceId_FK')?.errors === 'empty'">اسم الكليه مطلوبه</span>
+              </div>
+
+              </div>
+            <div class="row">
+              <div class="form-group col-sm-6">
+                <label class="text-muted">الدور
+                  <span class="text-error">*</span>
+                </label>
+                <angular2-multiselect [(ngModel)]="currentEditableFloor"  id="FloorId_FK-edit"  *ngIf="floorsEdit" [data]="floorsEdit" (keyup.Tab)="focusFloorUpdate($event)" (onOpen)="checkFloorValueUpdate(updateItemForm.get('FloorId_FK'))" (onSelect)="changeFloorEdit(updateItemForm.get('FloorId_FK').value[0].value)" [settings]="dropdownSettings" formControlName="FloorId_FK">
+                  <c-item>
+                    <ng-template let-item="item">
+                      <label>{{item.label}}</label>
+                    </ng-template>
+
+                  </c-item>
+                </angular2-multiselect>
+                <span class="text-error" *ngIf="updateItemForm.get('FloorId_FK')?.errors !== null && updateItemForm.get('FloorId_FK')?.errors === 'empty'">الدور مطلوب</span>
+
+
+              </div>
+              <div class="form-group col-sm-6">
+                <label class="text-muted">الغرفه
+                  <span class="text-error">*</span>
+
+                </label>
+                <angular2-multiselect [(ngModel)]="currentEditableOffice"  id="OfficeId_FK-edit"  *ngIf="officesEdit" [data]="officesEdit" (keyup.Tab)="focusOfficeUpdate($event)" (onOpen)="checkOfficeValueUpdate(updateItemForm.get('OfficeId_FK'))" [settings]="dropdownSettings" formControlName="OfficeId_FK">
+                  <c-item>
+                    <ng-template let-item="item">
+                      <label>{{item.label}}</label>
+                    </ng-template>
+
+                  </c-item>
+                </angular2-multiselect>
+                <span class="text-error" *ngIf="updateItemForm.get('OfficeId_FK')?.errors !== null && updateItemForm.get('OfficeId_FK')?.errors === 'empty'">الغرفه مطلوب</span>
+
+              </div>
+            </div>
+          <div class="form-group">
+
+            <label class="text-muted">نوع المخزن
+              <span class="text-error">*</span>
+            </label>
+            <angular2-multiselect [(ngModel)]="currentEditableStockType"  id="StockTypeId_FK-edit"  *ngIf="stockTypes" [data]="stockTypes" (keyup.Tab)="focusStockUpdate($event)" (onOpen)="checkStockValueUpdate(updateItemForm.get('StockTypeId_FK'))" [settings]="dropdownSettings" formControlName="StockTypeId_FK">
+              <c-item>
+                <ng-template let-item="item">
+                  <label>{{item.label}}</label>
+                </ng-template>
+
+              </c-item>
+            </angular2-multiselect>
+            <span class="text-error" *ngIf="updateItemForm.get('StockTypeId_FK')?.errors !== null && updateItemForm.get('StockTypeId_FK')?.errors === 'empty'">نوع المخزن مطلوب</span>
+
+          </div>
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" form="updateItemForm" class="btn btn-success btn-sm" [disabled]="updateItemForm.invalid">حفظ</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">اغلاق</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="delete-item" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div><h5 class="modal-title text-center">حذف المخزن</h5></div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="text-center">هل انت متأكد من حذف المخزن بشكل نهائي ؟ </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger btn-sm" (click)="deleteItem()">حذف</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">اغلاق</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="toggle-item" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div><h5 class="modal-title text-center">تفعيل / تعطيل المخزن</h5></div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="changeStatus(false)">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="text-center">هل انت متأكد من {{active}} المخزن ؟ </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success btn-sm" (click)="changeStatus(true)">حفظ</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" (click)="changeStatus(false)">اغلاق</button>
+      </div>
+    </div>
+  </div>
+</div>
+

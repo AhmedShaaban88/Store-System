@@ -1,0 +1,217 @@
+<div class="jumbotron jumbotron-fluid">
+
+  <div class="page-container">
+    <div class="row">
+      <div class="col-sm-8">
+        <h4 class="text-store-lang">النسخه الاحتياطيه</h4>
+
+      </div>
+      <div class="col-sm-4 text-store-lang-inverse">
+        <div class="dropdown">
+          <button class="btn dropdown-toggle text-white"  type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            الاجراءات
+          </button>
+          <div class="dropdown-menu text-store-lang" aria-labelledby="more-options">
+            <button type="button" class="btn btn-sm text-danger dropdown-item" >
+              <i class="fa fa-plus text-black-50"></i>
+
+              <span class="text-black-50">اضافه نسخه</span>
+            </button>
+            <button type="button" class="btn btn-sm text-danger dropdown-item"  data-toggle="modal" data-target="#settings">
+              <i class="fa fa-cogs text-black-50"></i>
+              <span class="text-black-50">الاعدادات</span>
+            </button>
+
+          </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid filter-container p-3">
+  <p class="text-muted">
+    <span class="small"> قم بالضغط علي الاجراءات لاضافه نسخه احتياطيه جديده او لاضافه اعدادات للنسخ الاحتياطيه</span><br>
+  </p>
+
+
+</div>
+<div class="container">
+  <div class="row">
+    <div class="table-responsive data-table">
+      <table class="table table-bordered table-sm table-hover">
+        <thead>
+        <tr>
+          <th scope="col">
+            <span>
+              <i class="fa"></i>
+            </span>
+            المسلسل</th>
+          <th scope="col">
+            <span>
+              <i class="fa"></i>
+            </span>
+            الموظف القائم بالتنزيل</th>
+          <th scope="col">
+            <span>
+              <i class="fa"></i>
+            </span>
+
+            اسم الملف
+          </th>
+          <th scope="col">
+            <span>
+              <i class="fa"></i>
+            </span>
+            الحجم</th>
+          <th scope="col">
+            <span>
+              <i class="fa"></i>
+            </span>
+            عدد مرات التحميل</th>
+
+          <th scope="col">
+            الاجراءات</th>
+        </tr>
+        </thead>
+        <ng-container>
+          <tbody>
+          <tr>
+            <th scope="row">1</th>
+
+            <td>احمد اابيمنيبقنمكبيبيبي</td>
+            <td>ثيسببريسبيسب</td>
+            <td>30 mb</td>
+            <td>300</td>
+            <td>
+              <div class="dropdown">
+                <button class="btn dropdown-toggle" type="button" id="more-options" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <i class="fa fa-ellipsis-h"></i>
+                  <i class="fa fa-caret-down" [ngClass]="translate.currentLang ==='ar' ? 'mr-1' : 'ml-1'"></i>
+                </button>
+
+                <div class="dropdown-menu text-store-lang" aria-labelledby="more-options">
+                  <button type="button" class="btn btn-sm text-success dropdown-item">
+                    <i class="fa fa-download"></i>
+
+                    {{"tables.download" | translate}}
+
+                  </button>
+                  <button type="button" class="btn btn-sm text-danger dropdown-item"  data-toggle="modal" data-target="#delete-item">
+                    <i class="fa fa-trash"></i>
+
+                    {{"tables.delete" | translate}}
+                  </button>
+
+                </div>
+              </div>
+            </td>
+
+
+          </tr>
+
+
+          </tbody>
+
+          <tfoot class="bg-white">
+          <tr>
+            <td colspan="8">              {{"tables.from" | translate}}
+              1               {{"tables.to" | translate}}
+             20              {{"tables.from" | translate}}
+             50</td>
+          </tr>
+          </tfoot>
+        </ng-container>
+      </table>
+    </div>
+  </div>
+</div>
+<div class="d-flex justify-content-center">
+  <div class="spinner-border" role="status">
+    <span class="sr-only">Loading...</span>
+  </div>
+</div>
+<div class="d-flex justify-content-center">
+  <div>
+    <h6 class="text-danger">{{"tables.no-data" | translate}}</h6>
+  </div>
+</div>
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="settings" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">الاعدادات</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <tabset [justified]="true">
+          <tab heading="اضافه ساعه محدده">
+              <form [formGroup]="clock" id="clock">
+                <div>
+                  <timepicker [formControlName]="'clockControl'" [minuteStep]="1" [meridians]="meridians"></timepicker>
+                </div>
+                <p class="text-center m-auto text-error mt-5" *ngIf="!clock.get('clockControl').value">الوقت خطأ</p>
+              </form>
+
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-success btn-sm">حفظ</button>
+              <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">اغلاق</button>
+            </div>
+          </tab>
+          <tab heading="تكرار علي فتره">
+            <form [formGroup]="clock2" id="clock2">
+              <div class="form-group">
+                <label for="repeate" class="text-muted">
+                  تكرار كل ساعه
+                  <span class="text-error">*</span>
+                </label>
+                <input type="number" formControlName="repeate" class="form-control" id="repeate"/>
+                <p class="text-center m-auto text-error mt-5" *ngIf="clock2.get('repeate').touched && (!clock2.get('repeate').value || clock2.get('repeate').value <= 0)">التكرار مطلوب ولا بد ان يكون اكبر من صفر </p>
+              </div>
+              <div class="form-group">
+                <label  class="text-muted">تبدأ الساعه
+                  <span class="text-error">*</span>
+                </label>
+                <timepicker [formControlName]="'clockStart'" [minuteStep]="1" [meridians]="meridians"></timepicker>
+                <p class="text-center m-auto text-error mt-5" *ngIf="!clock2.get('clockStart').value">الوقت خطأ</p>
+              </div>
+              <div class="form-group">
+                <label  class="text-muted">تنتهي الساعه
+                  <span class="text-error">*</span>
+                </label>
+                <timepicker [formControlName]="'clockEnd'" [minuteStep]="1" [meridians]="meridians"></timepicker>
+                <p class="text-center m-auto text-error mt-5" *ngIf="!clock2.get('clockEnd').value">الوقت خطأ</p>
+              </div>
+            </form>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-success btn-sm">حفظ</button>
+              <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">اغلاق</button>
+            </div>
+          </tab>
+        </tabset>
+      </div>
+    </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="delete-item" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div><h5 class="modal-title text-center">حذف فئه</h5></div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="text-center">هل انت متأكد من حذف النسخه بشكل نهائي ؟ </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger btn-sm">حذف</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">اغلاق</button>
+      </div>
+    </div>
+  </div>
+</div>

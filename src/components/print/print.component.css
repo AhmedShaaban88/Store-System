@@ -1,0 +1,7 @@
+.check-content{
+  position:absolute; /*it can be fixed too*/
+  left:0; right:0;
+  top:50%; bottom:0;
+  margin:auto;
+  overflow: hidden;
+}

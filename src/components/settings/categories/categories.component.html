@@ -1,0 +1,253 @@
+<div class="jumbotron jumbotron-fluid">
+
+  <div class="page-container">
+    <div class="row">
+      <div class="col-sm-8">
+        <h4 class="text-store-lang">الفئات</h4>
+
+      </div>
+      <div class="col-sm-4 text-store-lang-inverse">
+
+        <button type="button" class="btn text-white btn-sm" data-toggle="modal" data-target="#add-category"><span><i class="fa fa-plus"></i> </span> اضافه فئه </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="container-fluid filter-container p-3">
+  <p class="text-muted">
+    <span class="small"> قم بالبحث للحصول علي عدد معين من النتائج او الضغط علي اضافه فئه لاضافه فئه جديده</span><br>
+  </p>
+
+
+  <div class='row'>
+    <div class='col-md-6 search-container'>
+      <div class='search-box'>
+        <form class='search-form'>
+          <input class='form-control' placeholder='كلمه البحث هنا' type='text' (keyup.enter)="search($event.target.value)" (keyup.space)="search($event.target.value)" (input)="checkReset($event.target.value)">
+          <button class='btn btn-link search-btn'>
+            <i class='fa fa-search'></i>
+          </button>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+<div class="container ">
+  <div class="row">
+    <div class="table-responsive data-table">
+      <table class="table table-bordered table-sm table-hover">
+        <caption>الفئات</caption>
+        <thead>
+        <tr>
+          <th scope="col">
+            <span>
+              <i class="fa"></i>
+            </span>
+            المسلسل</th>
+          <th scope="col">
+            <span>
+              <i class="fa"></i>
+            </span>
+            الكود</th>
+          <th scope="col" class="sortable" (click)="sortCol='Ar';sort($event.target);">
+            <span>
+              <i class="fa"></i>
+            </span>
+
+            اسم الفئه
+          </th>
+          <th scope="col" class="sortable" (click)="sortCol='En';sort($event.target);">
+            <span>
+              <i class="fa"></i>
+            </span>
+            اسم الفئه باللغه الانجليزيه</th>
+
+          <th scope="col">
+            الاجراءات</th>
+        </tr>
+        </thead>
+        <ng-container *ngIf="categories">
+        <tbody>
+        <tr *ngFor="let item of categories.m_Item1;let i = index">
+          <th scope="row">{{i+1}}</th>
+
+          <td>{{item.CategoryCode}}</td>
+          <td>{{item.CategoryNameAr}}</td>
+          <td>{{item.CategoryNameEn}}</td>
+          <td>
+            <div class="dropdown">
+              <button class="btn dropdown-toggle" type="button" id="more-options" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-ellipsis-h"></i>
+                <i class="fa fa-caret-down" [ngClass]="translate.currentLang ==='ar' ? 'mr-1' : 'ml-1'"></i>
+              </button>
+
+              <div class="dropdown-menu text-store-lang" aria-labelledby="more-options">
+                <button type="button" class="btn btn-sm text-primary dropdown-item" data-toggle="modal" data-target="#update-item" (click)="updateForm(item, i)">
+                  <i class="fa fa-pencil"></i>
+
+                  {{"tables.edit" | translate}}
+
+                </button>
+                <button type="button" class="btn btn-sm text-danger dropdown-item"  data-toggle="modal" data-target="#delete-item" (click)="selectedItem= item">
+                  <i class="fa fa-trash"></i>
+
+                  {{"tables.delete" | translate}}
+                </button>
+
+              </div>
+            </div>
+          </td>
+
+
+        </tr>
+
+
+        </tbody>
+
+        <tfoot class="bg-white" *ngIf="categories?.m_Item1.length > 0">
+        <tr>
+          <td colspan="8">              {{"tables.from" | translate}}
+            1               {{"tables.to" | translate}}
+            {{categories.m_Item1.length}}               {{"tables.from" | translate}}
+            {{categories.m_Item2}}</td>
+        </tr>
+        </tfoot>
+        </ng-container>
+      </table>
+    </div>
+  </div>
+</div>
+<div class="d-flex justify-content-center" *ngIf="!categories || spinnerMoreData">
+  <div class="spinner-border" role="status">
+    <span class="sr-only">Loading...</span>
+  </div>
+</div>
+<div class="d-flex justify-content-center" *ngIf="categories?.m_Item1.length === 0">
+  <div>
+    <h6 class="text-danger">{{"tables.no-data" | translate}}</h6>
+  </div>
+</div>
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="add-category" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">فئه جديده</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form (keydown.enter)="$event.preventDefault()" [formGroup]="addItemForm" id="addItemForm" (ngSubmit)="addItemSubmit()">
+          <div class="form-row">
+
+            <div class="form-group col-md-12">
+              <label for="name-ar" class="text-muted">
+                اسم الفئه بالعربي
+                <span class="text-error">*</span>
+              </label>
+              <input type="text" class="form-control" formControlName="nameAr" id="name-ar" placeholder="اسم الفئه باللغه العربيه">
+              <span class="text-error" *ngIf="addItemForm.get('nameAr').touched && addItemForm.get('nameAr').invalid">اسم الفئه بالعربي مطلوب</span>
+
+            </div>
+          </div>
+          <div class="form-row">
+
+            <div class="form-group col-md-12">
+              <label for="name-en" class="text-muted">
+                اسم الفئه بالانجليزي
+                <span class="text-error">*</span>
+              </label>
+              <input type="text" class="form-control" id="name-en" formControlName="nameEn" placeholder="اسم الفئه باللغه الانجليزيه">
+              <span class="text-error" *ngIf="addItemForm.get('nameEn').touched && addItemForm.get('nameEn').invalid">اسم الفئه بالانجليزي مطلوب</span>
+
+            </div>
+          </div>
+
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-success btn-sm" form="addItemForm" [disabled]="addItemForm.invalid">حفظ</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">اغلاق</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="delete-item" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div><h5 class="modal-title text-center">حذف فئه</h5></div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="text-center">هل انت متأكد من حذف الفئه بشكل نهائي ؟ </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger btn-sm" (click)="deleteItem()">حذف</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">اغلاق</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="update-item" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">تعديل فئه</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form (keydown.enter)="$event.preventDefault()" [formGroup]="updateItemForm" id="updateItemForm" (ngSubmit)="updateItemSubmit()">
+          <div class="form-row">
+
+            <div class="form-group col-md-12">
+              <label for="name-ar" class="text-muted">
+                كود الفئه
+              </label>
+              <input type="text" class="form-control" formControlName="code" id="code" readonly>
+
+            </div>
+          </div>
+          <div class="form-row">
+
+            <div class="form-group col-md-12">
+              <label for="name-ar" class="text-muted">
+                اسم الفئه بالعربي
+                <span class="text-error">*</span>
+              </label>
+              <input type="text" class="form-control" formControlName="nameAr" id="name-ar-edit" placeholder="اسم الفئه باللغه العربيه">
+              <span class="text-error" *ngIf="updateItemForm.get('nameAr').touched && updateItemForm.get('nameAr').invalid">اسم الفئه بالعربي مطلوب</span>
+
+            </div>
+          </div>
+          <div class="form-row">
+
+            <div class="form-group col-md-12">
+              <label for="name-en" class="text-muted">
+                اسم الفئه بالانجليزي
+                <span class="text-error">*</span>
+              </label>
+              <input type="text" class="form-control" id="name-en-edit" formControlName="nameEn" placeholder="اسم الفئه باللغه الانجليزيه">
+              <span class="text-error" *ngIf="updateItemForm.get('nameEn').touched && updateItemForm.get('nameEn').invalid">اسم الفئه بالانجليزي مطلوب</span>
+
+            </div>
+          </div>
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-success btn-sm" form="updateItemForm" [disabled]="updateItemForm.invalid">حفظ</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">اغلاق</button>
+      </div>
+    </div>
+  </div>
+</div>

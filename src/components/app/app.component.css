@@ -1,0 +1,13 @@
+.container-all{
+  margin-top: 70px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+@media screen and (max-width: 993px){
+  .container-all{
+    margin-top: 60px;
+    overflow: auto;
+  }
+}
+

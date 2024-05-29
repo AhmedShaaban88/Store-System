@@ -1,0 +1,199 @@
+<div class="jumbotron jumbotron-fluid">
+
+  <div class="page-container">
+    <div class="row">
+      <div class="col-sm-8">
+        <h4 class="text-store-lang">اضافه محضر مرتجع</h4>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid filter-container">
+  <p class="text-muted">
+    <span class="small">قم بملئ الخانات الاتيه والتأكد من سلامه المعلومات المدخله والضغط علي حفظ </span><br>
+  </p>
+  <div class="d-flex justify-content-center" *ngIf="!returnName">
+    <div class="spinner-border" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+  </div>
+
+    <div class="container p-2" style="flex-direction: column;" *ngIf="returnName">
+      <form (keydown.enter)="$event.preventDefault()" [formGroup]="addItemForm" id="addItemForm" (ngSubmit)="addItemSubmit()">
+        <div class="row">
+       <div class="col-sm-4">
+         <div class="form-group">
+           <label for="RecievedFromMaintanceName" class="text-muted">اسم المحضر
+           </label>
+           <input type="text" class="form-control" tabindex="-1" readonly [value]="returnName" formControlName="RecievedFromMaintanceName" id="RecievedFromMaintanceName" placeholder="رقم طلب التحويل">
+         </div>
+       </div>
+         <div class="col-sm-4">
+           <div class="form-group">
+             <label for="RecievedFromMaintanceDate" class="text-muted">تاريخ المحضر
+               <span class="text-error">*</span>
+             </label>
+             <input type="text"
+                    placeholder="تاريخ الطلب"
+                    class="form-control"
+                    id="RecievedFromMaintanceDate"
+                    bsDatepicker
+                    #dp=bsDatepicker
+                    [bsValue]="today"
+                    (focus)="dp.show()"
+                    readonly
+                    formControlName="RecievedFromMaintanceDate" required>
+             <span class="text-error" *ngIf="addItemForm.get('RecievedFromMaintanceDate').touched && addItemForm.get('RecievedFromMaintanceDate').invalid">تاريخ الطلب مطلوب</span>
+           </div>
+         </div>
+
+
+
+
+         <div class="col-sm-4">
+           <div class="form-group">
+             <label for="MaintenanceOrderId_FK" class="text-muted">اسم محضر الصيانه
+               <span class="text-error">*</span>
+             </label>
+             <angular2-multiselect  [loading] = "loadingFrom" id="MaintenanceOrderId_FK"  (onScrollToEnd)="loadMoreMaintainace($event)"  *ngIf="allMaintainaces" [data]="allMaintainaces?.m_Item1" [settings]="dropdownSettings" (onSelect)="changeMaintainace($event)" formControlName="MaintenanceOrderId_FK" (keyup.Tab)="focusMaintaince($event)" (onOpen)="checkMaintainaceValue(addItemForm.get('MaintenanceOrderId_FK').value)" >
+               <c-search>
+                 <ng-template>
+                   <input type="text" (keyup)="onSearch($event)" [placeholder]="translate.currentLang === 'ar' ?  'كلمه البحث' : 'Search'"/>
+                 </ng-template>
+               </c-search>
+               <c-item>
+                 <ng-template let-item="item">
+                   <label>{{item.label}}</label>
+                 </ng-template>
+
+               </c-item>
+             </angular2-multiselect>
+             <span class="text-error" *ngIf="addItemForm.get('MaintenanceOrderId_FK').value.length === 0 && visitedMaintainace">اسم محضر الصيانه مطلوب</span>
+
+
+           </div>
+         </div>
+
+        </div>
+
+        <div class="row p-2">
+        <div class="col-sm-12 text-center" *ngIf="addItemForm.get('MaintenanceOrderId_FK').value.length > 0 && allItems?.m_Item1.length === 0">
+          <p class="text-error">تم رجوع كل البيانات من هذا المحضر</p>
+        </div>
+          <div style="width: 100%" *ngIf="addItemForm.get('MaintenanceOrderId_FK').value.length > 0 && allItems?.m_Item1.length > 0">
+            <table class="table table-bordered table-sm" >
+              <thead>
+              <tr>
+                <th scope="col">
+
+                  <div class="custom-control custom-checkbox">
+                    <input *ngIf="returnsItems.length > 0" (change)="checkAllBoxes()" type="checkbox" class="custom-control-input" id="checkAll">
+                    <label class="custom-control-label" for="checkAll">
+                    <span id="checkAllLabel" (click)="checkAllBoxes()">تحديد الكل</span>
+                    </label>
+                  </div>
+                </th>
+                <th scope="col">
+                  كود الصنف</th>
+                <th scope="col">
+
+                  اسم الصنف
+                </th>
+                <th scope="col">
+                  من مخزن</th>
+                <th scope="col">
+                  الي مخزن</th>
+                <th scope="col" class="text-center" colspan="2">
+                  <span>الكميه</span><br>
+                  <span>الكرتونه</span>
+                  <span>/</span>
+                  <span>العدد</span>
+
+                </th>
+              </tr>
+              </thead>
+              <tbody formArrayName="RecievedDatalist">
+              <ng-container *ngFor="let details of addItemForm.get('RecievedDatalist').controls; let i = index;" >
+                <tr [formGroupName]="i" [ngClass]="(errorRows.indexOf(i) > -1 || zeroRow === i) ? 'bg-danger' : 'bg-white'">
+                  <td class="column-divided-table check-box">
+                    <div class="custom-control custom-checkbox">
+                      <input (change)="checkOneBox(i)" [disabled]="(zeroRow !== -1 && zeroRow !== i)" type="checkbox" class="custom-control-input" [id]="i">
+                      <label class="custom-control-label" [htmlFor]="i">
+                        <span class="check-span">تحديد </span>
+                      </label>
+                    </div>
+                  </td>
+                  <td class="column-divided-table">
+                    <div class="form-group">
+                      <span>{{details.get('ItemsCode').value}}</span>
+                    </div>
+                  </td>
+                  <td class="column-divided-table">
+                    <div class="form-group">
+                      <span>{{details.get('ItemsName').value}}</span>
+                    </div>
+                  </td>
+                  <td class="column-divided-table">
+                    <div class="form-group">
+                      <span>{{details.get('StockFromName').value}}</span>
+                    </div>
+                  </td>
+                  <td class="column-divided-table">
+                    <div class="form-group">
+                      <span>{{details.get('StockToName').value}}</span>
+                    </div>
+                  </td>
+
+
+                  <td class="column-divided">
+                    <input type="number" min="0" class="form-control"  formControlName="RecievedFromMaintanceItemsQuantityBox" required id="items-count" [readOnly]="(zeroRow !== -1 && zeroRow !== i)" (change)="checkAvailabiltyQuantity(details.get('RecievedMaintanceStockId_From_FK').value, details.get('RecievedMaintanceStockId_To_FK').value, details.get('RecievedFromMaintanceItemsQuantityBox').value, details.get('RecievedFromMaintanceItemsQuantityNumber').value, i, addItemForm.get('MaintenanceOrderId_FK').value,details.get('ItemsId_FK').value)">
+                    <ng-container *ngIf="details.get('RecievedFromMaintanceItemsQuantityBox').touched && details.get('RecievedFromMaintanceItemsQuantityBox').errors">
+                    <span class="text-error" *ngIf="details.get('RecievedFromMaintanceItemsQuantityBox').touched && details.get('RecievedFromMaintanceItemsQuantityBox').errors.required">عدد العناصر مطلوب</span>
+                    <span class="text-error" *ngIf="details.get('RecievedFromMaintanceItemsQuantityBox').errors.min">عدد العناصر لابد ان يكون رقم صحيح</span>
+                    </ng-container>
+                  </td>
+                  <td class="column-divided">
+                    <input type="number" min="0" class="form-control" formControlName="RecievedFromMaintanceItemsQuantityNumber" required [readOnly]="(zeroRow !== -1 && zeroRow !== i)" (change)="checkAvailabiltyQuantity(details.get('RecievedMaintanceStockId_From_FK').value, details.get('RecievedMaintanceStockId_To_FK').value, details.get('RecievedFromMaintanceItemsQuantityBox').value, details.get('RecievedFromMaintanceItemsQuantityNumber').value, i, addItemForm.get('MaintenanceOrderId_FK').value,details.get('ItemsId_FK').value)">
+                    <ng-container *ngIf="details.get('RecievedFromMaintanceItemsQuantityNumber').touched && details.get('RecievedFromMaintanceItemsQuantityNumber').errors">
+                      <span class="text-error" *ngIf="details.get('RecievedFromMaintanceItemsQuantityNumber').touched && details.get('RecievedFromMaintanceItemsQuantityNumber').errors.required">عدد العناصر مطلوب</span>
+                      <span class="text-error" *ngIf="details.get('RecievedFromMaintanceItemsQuantityNumber').errors.min">عدد العناصر لابد ان يكون رقم صحيح</span>
+                    </ng-container>
+                  </td>
+                </tr>
+              </ng-container>
+              </tbody>
+            </table>
+          </div>
+
+
+
+        </div>
+      </form>
+      <div class="row" style="background-color: #dee2e6; padding: 10px;" *ngIf="addItemForm.get('MaintenanceOrderId_FK').value.length > 0 && allItems?.m_Item1.length > 0">
+        <div class="col-sm-12 text-left">
+          <button type="submit" form="addItemForm" class="btn btn-success btn-sm" [disabled]="zeroRow !== -1 || returnsItems.length === 0">
+      <span>
+
+                حفظ
+      </span>
+          </button>
+          <button type="button" form="addItemForm" class="btn btn-danger btn-sm" [disabled]="!addItemForm.touched" [ngClass]="translate.currentLang === 'ar' ? 'mr-1' : 'ml-1'" (click)="resetForm()">
+      <span>
+
+                تفريغ
+      </span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  <div class="d-flex justify-content-center" *ngIf="spinnerMoreData">
+    <div class="spinner-border" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+  </div>
+</div>
+
+

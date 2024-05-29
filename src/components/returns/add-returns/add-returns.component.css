@@ -1,0 +1,12 @@
+.custom-control-label::before {
+  top: .25rem!important;
+  right: 0.5rem!important;
+  left: 0!important;
+}
+.custom-control-label::after {
+  right: 0.5rem!important;
+  left: 0!important;
+}
+#checkAllLabel, .check-span{
+  margin-right: 32px;
+}

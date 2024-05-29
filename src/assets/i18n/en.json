@@ -1,0 +1,74 @@
+{
+  "home": {
+    "title": "Home"
+  },
+  "header": {
+    "title": "Stores | Delta University",
+    "links": {
+      "transform": {
+        "title": "Transforms",
+        "home": "All",
+        "add": "Add Transform"
+      },
+      "supply": {
+        "title": "Supply Bonds",
+        "home": "All",
+        "add": "Add Supply Bonds"
+      },
+      "maintenance": {
+        "title": "Maintenance Record",
+        "home": "All",
+        "add": "Add Maintenance Record"
+      },
+      "damage": {
+        "title": "Damage",
+        "home": "All",
+        "add": "Add Damage Record"
+      },
+      "returns": {
+        "title": "Returns",
+        "home": "All",
+        "add": "Add Return Record"
+      },
+      "settings": {
+        "title": "Settings",
+        "links": {
+          "stocks": "Stocks",
+          "items": "Items",
+          "categories": "Categories",
+          "backup": "Backup"
+
+        }
+      },
+      "print": {
+        "title": "Print"
+      }
+    }
+  },
+  "tables": {
+    "not-found": "none",
+    "from": "from",
+    "to": "to",
+    "edit": "Edit",
+    "delete": "Delete",
+    "details": "Details",
+    "no-data": "No data until now",
+    "download": "Download"
+  },
+"not-found": {
+  "title": "page not found",
+  "message": "Sorry the page does not exist",
+  "home": "Home"
+},
+  "login": {
+    "title": "Login",
+    "pageTitle": "Login",
+    "username": "Username",
+    "password": "Password",
+    "loginBtn": "Login"
+  },
+  "loading": "loading ...",
+  "footer": {
+    "message": " © 2019 Copyright Software Engineering Department | Delta University"
+  }
+}

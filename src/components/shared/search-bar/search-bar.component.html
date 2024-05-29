@@ -1,0 +1,25 @@
+<div class="row" (keyup.ESC)="hideSearch()" id="search-container">
+  <div class="col-sm-4 search-content">
+    <div class="search-sidebar">
+      <span class="close-search" (click)="hideSearch()"><i class="fa fa-close"></i> </span>
+      <div class="form-group has-search mt-2">
+        <input type="text" id="inputSearch" class="form-control" placeholder="البحث" (keyup.enter)="search($event.target.value)" (keyup.space)="search($event.target.value)">
+      </div>
+      <p class="text-danger text-center" *ngIf="searchResults?.m_Item2 === 0"> {{translate.currentLang === 'ar' ? 'لا يوجد نتائج' : 'No results found'}}</p>
+      <p class="text-center" *ngIf="searchResults?.m_Item2 > 0"> عدد النتائج: <b>{{searchResults.m_Item2}}</b></p>
+      <ul *ngIf="searchResults" id="search-list" (scroll)="loadMoreData()">
+        <li *ngFor="let item of searchResults.m_Item1" (click)="onSelect(item)">{{item.label}}</li>
+        <div class="d-flex justify-content-center" *ngIf="spinnerMoreData">
+          <div class="spinner-border" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+        </div>
+      </ul>
+    </div>
+  </div>
+  <div class="col-sm-8 fake-search" (click)="hideSearch()">
+
+  </div>
+</div>
+
+

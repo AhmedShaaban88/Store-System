@@ -1,0 +1,338 @@
+<app-search-bar id="search-container" class="hidden" [from]="'transform'" (searchValue)="getValue($event)"></app-search-bar>
+
+<div class="jumbotron jumbotron-fluid">
+
+  <div class="page-container">
+    <div class="row">
+      <div class="col-sm-8">
+        <h4 class="text-store-lang"> سند التوريد</h4>
+
+      </div>
+      <div class="col-sm-4 text-store-lang-inverse">
+
+        <button type="button" class="btn text-white btn-sm" routerLink="add-supply"><span><i class="fa fa-plus"></i> </span> اضافه سند توريد </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="container-fluid filter-container p-3">
+  <p class="text-muted">
+    <span class="small">قم بالضغط علي البحث للبحث عن نتيجه معينه او علي تصفيه للحصول علي عدد معين من النتائج</span><br>
+  </p>
+  <div class="row">
+    <div class="col-sm-6">
+      <button type="button" class="btn btn-light" (click)="search=true;filter=false;"><span>البحث</span>
+        <span [ngClass]="translate.currentLang ==='ar' ? 'mr-4' : 'ml-4'">
+          <i class="fa fa-search"></i> </span></button>
+    </div>
+    <div class="col-sm-6 text-store-lang-inverse">
+      <button type="button" class="btn btn-light" (click)="filter=true;search=false;"><span>تصفيه</span>
+        <span [ngClass]="translate.currentLang ==='ar' ? 'mr-4' : 'ml-4'">
+          <i class="fa fa-filter"></i> </span></button>
+    </div>
+  </div>
+
+  <div class='row' *ngIf="search">
+    <div class='col-md-6 search-container'>
+      <div class='search-box'>
+        <form class='search-form'>
+          <input class='form-control' placeholder='كلمه البحث هنا' type='text'>
+          <button class='btn btn-link search-btn'>
+            <i class='fa fa-search'></i>
+          </button>
+        </form>
+
+      </div>
+    </div>
+  </div>
+  <div class='row' *ngIf="filter">
+    <div class='col-md-6 form-container'>
+      <div >
+        <input type="text"
+               placeholder="تاريخ المحضر"
+               class="form-control"
+               bsDatepicker>
+      </div>
+    </div>
+  </div>
+
+</div>
+<div class="container ">
+  <div class="row">
+    <div class="table-responsive data-table">
+      <table class="table table-bordered table-sm table-hover">
+        <caption>سند التوريد</caption>
+        <thead>
+        <tr>
+          <th scope="col" (click)="sort($event.target)">
+            <span>
+              <i class="fa"></i>
+            </span>
+            المسلسل</th>
+          <th scope="col" (click)="sort($event.target)">
+            <span>
+              <i class="fa"></i>
+            </span>
+
+            رقم السند
+          </th>
+          <th scope="col" (click)="sort($event.target)">
+            <span>
+              <i class="fa"></i>
+            </span>
+            تاريخ السند</th>
+
+          <th scope="col">
+            الاجراءات</th>
+        </tr>
+        </thead>
+        <ng-container *ngIf="allSupplies">
+        <tbody>
+        <tr *ngFor="let item of allSupplies.m_Item1;let i = index">
+          <th scope="row">{{i+1}}</th>
+          <td>{{item.SupplyOrderName}}</td>
+          <td>{{item.SupplyOrderDate | date:'dd/MM/yyyy'}}</td>
+          <td>
+            <div class="dropdown">
+              <button class="btn dropdown-toggle" type="button" id="more-options" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-ellipsis-h"></i>
+                <i class="fa fa-caret-down" [ngClass]="translate.currentLang ==='ar' ? 'mr-1' : 'ml-1'"></i>
+              </button>
+
+              <div class="dropdown-menu text-store-lang" aria-labelledby="more-options">
+                <button type="button" class="btn btn-sm text-primary dropdown-item" data-toggle="modal" data-target="#edit-item" (click)="editItem(item.SupplyOrderId);currentEditableRow = i">
+                  <i class="fa fa-pencil"></i>
+
+                  {{"tables.edit" | translate}}
+
+                </button>
+                <button type="button" class="btn btn-sm text-danger dropdown-item" data-toggle="modal" data-target="#delete-item" (click)="selectedItem= item">
+                  <i class="fa fa-trash"></i>
+                  {{"tables.delete" | translate}}
+                </button>
+
+              </div>
+            </div>
+          </td>
+
+
+        </tr>
+
+
+
+        </tbody>
+        </ng-container>
+        <tfoot class="bg-white" *ngIf="allSupplies?.m_Item1.length > 0">
+        <tr>
+          <td colspan="8">              {{"tables.from" | translate}}
+            1               {{"tables.to" | translate}}
+            {{allSupplies?.m_Item1.length}}               {{"tables.from" | translate}}
+            {{allSupplies?.m_Item2}}</td>
+        </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="d-flex justify-content-center" *ngIf="!allSupplies || spinnerMoreData">
+  <div class="spinner-border" role="status">
+    <span class="sr-only">Loading...</span>
+  </div>
+</div>
+<div class="d-flex justify-content-center" *ngIf="allSupplies?.m_Item1.length === 0">
+  <div>
+    <h6 class="text-danger">{{"tables.no-data" | translate}}</h6>
+  </div>
+</div>
+
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="edit-item" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">تعديل سند التوريد</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container p-2" style="flex-direction: column;">
+          <form (keydown.enter)="$event.preventDefault()" [formGroup]="addItemForm" id="addItemForm" (ngSubmit)="addItemSubmit()">
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="form-group">
+                  <label for="transformPermissionName" class="text-muted">اسم سند التوريد
+                  </label>
+                  <input type="text" readonly class="form-control" formControlName="SupplyOrderName" required id="transformPermissionName" placeholder="اسم سند التوريد">
+                  <span class="text-error" *ngIf="addItemForm.get('SupplyOrderName').touched && addItemForm.get('SupplyOrderName').invalid">اسم سند التوريد</span>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="form-group">
+                  <label for="transformPermissionDate" class="text-muted">تاريخ الطلب
+                    <span class="text-error">*</span>
+                  </label>
+                  <input type="text"
+                         placeholder="تاريخ الطلب"
+                         class="form-control"
+                         id="transformPermissionDate"
+                         bsDatepicker
+                         #dp=bsDatepicker
+                         (focus)="dp.show()"
+                         readonly
+                         formControlName="SupplyOrderDate" required>
+                  <span class="text-error" *ngIf="addItemForm.get('SupplyOrderDate').touched && addItemForm.get('SupplyOrderDate').invalid">تاريخ الطلب مطلوب</span>
+                </div>
+              </div>
+
+
+            </div>
+            <div class="row p-2">
+
+              <div style="width: 100%">
+                <table class="table table-bordered table-sm">
+                  <thead>
+                  <tr>
+                    <th scope="col">
+                      كود الصنف</th>
+                    <th scope="col">
+
+                      اسم الصنف
+                    </th>
+                    <th scope="col">
+                      الي مخزن</th>
+                    <th scope="col">
+                      اسم الموظف</th>
+                    <th scope="col" class="text-center" colspan="2">
+                      <span>الكميه</span><br>
+                      <span>الكرتونه</span>
+                      <span>/</span>
+                      <span>العدد</span>
+
+                    </th>
+                    <th scope="col">
+                      الاجراءات</th>
+                  </tr>
+                  </thead>
+                  <tbody formArrayName="SupplyDataObj">
+                  <ng-container *ngFor="let details of  addItemForm.get('SupplyDataObj')['controls']; let i = index;" >
+
+                    <tr [formGroupName]="i" [ngClass]="(duplicatedItem === i || errorRow === i || zerosRow === i) ? 'bg-danger' : 'bg-white'">
+                      <td class="column-divided">
+                        <div class="form-group">
+                          <input type="text" class="form-control" formControlName="ItemsCode_FK" placeholder="كود الصنف" (dblclick)="openSearchBar(i)" (focus)="currentEditIndex = i" (keyup.Tab)="currentEditIndex = i" (change)="getItemName(details.get('ItemsCode_FK').value, details.get('ItemsId_FK'), details.get('ItemsName'), i)">
+                        </div>
+                        <span class="text-error" *ngIf="details.get('ItemsCode_FK').touched && details.get('ItemsCode_FK').invalid">كود الصنف مطلوب</span>
+                      </td>
+                      <td class="column-divided">
+                        <div class="form-group">
+                          <input *ngIf="translate.currentLang === 'ar'"  [ngStyle]="{'color': details.get('ItemsName')?.value?.indexOf('لا يوجد') <= -1  ? 'black' : 'red' }" class="form-control" disabled [value]="details.get('ItemsName')?.value" formControlName="ItemsName">
+                          <input *ngIf="translate.currentLang === 'en'" [ngStyle]="{'color': details.get('ItemsName')?.value?.indexOf('not found') <= -1  ? 'black' : 'red' }" class="form-control" disabled [value]="details.get('ItemsName')?.value" formControlName="ItemsName">
+                        </div>
+                      </td>
+                      <td class="flex-table">
+                        <div class="form-group">
+                          <angular2-multiselect  [(ngModel)]="details.get('StockId_FK').value"  [loading] = "loadingTo" id="stockIdTo"  (onScrollToEnd)="loadMoreStockTo($event)"  *ngIf="allStoresTo" [data]="allStoresTo?.m_Item1" [settings]="(duplicatedItem !== -1 && duplicatedItem !== i) ? disabledOption : dropdownSettings" formControlName="StockId_FK" (keyup.Tab)="focusStockTo($event); currentEditIndex = i" (onOpen)="checkStoreToValue(details.get('StockId_FK'), i)" (onSelect)="checkDuplicated(details.get('StockId_FK')?.value[0]?.value, details.get('ItemsId_FK').value, i)">
+                            <c-search>
+                              <ng-template>
+                                <input type="text" (keyup)="onSearchTo($event, i + 1)" [placeholder]="translate.currentLang === 'ar' ?  'كلمه البحث' : 'Search'"/>
+                              </ng-template>
+                            </c-search>
+                            <c-item>
+                              <ng-template let-item="item">
+                                <label>{{item.label}}</label>
+                              </ng-template>
+
+                            </c-item>
+                          </angular2-multiselect>
+                          <span class="text-error" *ngIf="details.get('StockId_FK')?.errors !== null && details.get('StockId_FK')?.errors === 'empty'">اسم المخزن مطلوب</span>
+
+                        </div>
+                      </td>
+                      <td class="flex-table">
+                        <div class="form-group">
+                          <angular2-multiselect [(ngModel)]="details.get('RecievedId_FK').value"  [loading] = "loadingReciver" id="receiveId"  (onScrollToEnd)="loadMoreEmp($event)"  *ngIf="allEmp" [data]="allEmp?.m_Item1" formControlName="RecievedId_FK" (keyup.Tab)="focusEmp($event); currentEditIndex = i" [settings]="dropdownSettings" (onOpen)="checkEmpValue(details.get('RecievedId_FK'), i)">
+                            <c-search>
+                              <ng-template>
+                                <input type="text" (keyup)="onSearchEmp($event, i + 1)" [placeholder]="translate.currentLang === 'ar' ?  'كلمه البحث' : 'Search'"/>
+                              </ng-template>
+                            </c-search>
+                            <c-item>
+                              <ng-template let-item="item">
+                                <label>{{item.label}}</label>
+                              </ng-template>
+
+                            </c-item>
+                          </angular2-multiselect>
+                          <span class="text-error" *ngIf="details.get('RecievedId_FK')?.errors !== null && details.get('RecievedId_FK')?.errors === 'empty'">اسم الموظف مطلوب</span>
+                        </div>
+                      </td>
+                      <td class="column-divided">
+                        <input type="number" min="0" class="form-control" formControlName="SupplyQuantityBox" required id="items-count" [readOnly]="(!(details.get('ItemsId_FK')?.value && details.get('StockId_FK')?.value[0]?.value) || (errorRow !== -1 && errorRow !== i) || duplicatedItem !== -1)" (change)="checkQuantity(details.get('SupplyQuantityBox').value, details.get('SupplyQuantityNumber').value, i)">
+                        <ng-container *ngIf="details.get('SupplyQuantityBox').touched && details.get('SupplyQuantityBox').errors">
+                          <span class="text-error" *ngIf="details.get('SupplyQuantityBox').touched && details.get('SupplyQuantityBox').errors.required">عدد العناصر مطلوب</span>
+                          <span class="text-error" *ngIf="details.get('SupplyQuantityBox').errors.min">عدد العناصر لابد ان يكون رقم صحيح</span>
+                        </ng-container>
+                      </td>
+                      <td class="column-divided">
+                        <input type="number" min="0" class="form-control" formControlName="SupplyQuantityNumber" required [readOnly]="(!(details.get('ItemsId_FK')?.value && details.get('StockId_FK')?.value[0]?.value) || (errorRow !== -1 && errorRow !== i) || duplicatedItem !== -1)" (change)="checkQuantity(details.get('SupplyQuantityBox').value, details.get('SupplyQuantityNumber').value, i)">
+                        <ng-container *ngIf="details.get('SupplyQuantityNumber').touched && details.get('SupplyQuantityNumber').errors">
+                          <span class="text-error" *ngIf="details.get('SupplyQuantityNumber').touched && details.get('SupplyQuantityNumber').errors.required">عدد العناصر مطلوب</span>
+                          <span class="text-error" *ngIf="details.get('SupplyQuantityNumber').errors.min">عدد العناصر لابد ان يكون رقم صحيح</span>
+                        </ng-container>
+
+                      </td>
+                      <td>
+                        <button  type="button" class="btn btn-sm btn-danger" [disabled]="(duplicatedItem !== -1 && duplicatedItem !== i)" (click)="removeItem(i)">
+                          <i class="fa fa-trash"></i>
+
+                          حذف
+                        </button>
+                      </td>
+
+                    </tr>
+                  </ng-container>
+                  </tbody>
+                </table>
+                <div class="row text-center" style="display: block">
+                  <button type="button" class="btn btn-sm btn-success" (click)="addMoreRows()" [disabled]="errorRow !== -1 || notFound || duplicatedItem !== -1 || zerosRow !== -1">
+                    <i class="fa fa-plus"></i>
+
+                    اضافه سند
+                  </button>
+                </div>
+              </div>
+
+
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-success btn-sm" form="addItemForm"  [disabled]="errorRow !== -1 || supplyItems.length === 0 || notFound || duplicatedItem !== -1 || zerosRow !== -1">حفظ</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">اغلاق</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="delete-item" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div><h5 class="modal-title text-center">حذف سند التوريد</h5></div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="text-center">هل انت متأكد من حذف سند التوريد بشكل نهائي ؟ </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger btn-sm" (click)="deleteItem()">حذف</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">اغلاق</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,163 @@
+<div class="container">
+  <div class="check-content hidden">
+    <div class="d-flex justify-content-center">
+      <div class="spinner-border" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
+      <div class="row">
+        <div class="col-sm-12 text-center">
+          <h4>جارٍ اكتشاف الأداة المساعدة في جانب جهاز المستخدم...</h4>
+          <h6>الرجاء الانتظار لثواني...</h6>
+        </div>
+      </div>
+
+    </div>
+  <div class="download-content check-content hidden">
+      <div class="row">
+        <div class="col-sm-12 text-center text-danger">
+          <h4> عفوا الاداه غير مثبته علي جهازك قم بتنزيل البرنامج المختص بعمليه الطباعه </h4>
+          <!--<a href="api/DownloadApps" class="btn btn-success">تثبيت البرنامج</a>-->
+
+        </div>
+      </div>
+
+    </div>
+
+  <div class="row ">
+    <div class="col-sm-12 text-center">
+    <h3>طباعه الباركود</h3>
+
+    <form (keydown.enter)="$event.preventDefault()" [formGroup]="addItemForm" id="addItemForm" (ngSubmit)="addItemSubmit()">
+
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="name-print" class="text-muted">الطابعه
+            <span class="text-error">*</span>
+          </label>
+          <angular2-multiselect  id="name-print">
+            <c-item>
+              <ng-template let-item="item">
+                <label>2222</label>
+              </ng-template>
+
+            </c-item>
+          </angular2-multiselect>
+        </div>
+        <div class="form-group col-md-6">
+          <label for="name-item" class="text-muted">اسم الصنف
+            <span class="text-error">*</span>
+          </label>
+          <angular2-multiselect [loading]="loadingItems"  id="name-item" *ngIf="items" [data]="items?.m_Item1" (onScrollToEnd)="loadMoreItems($event)" (keyup.Tab)="focusItems($event)" (onOpen)="checkItemsValueAdd(addItemForm.get('itemId'))" (onSelect)="itemName = addItemForm.get('itemId')?.value[0]?.label" [settings]="lazyLoadabelDropDown" formControlName="itemId">
+            <c-search>
+              <ng-template>
+                <input type="text" (keyup)="onSearch($event)" [placeholder]="translate.currentLang === 'ar' ?  'كلمه البحث' : 'Search'"/>
+              </ng-template>
+            </c-search>
+            <c-item>
+              <ng-template let-item="item">
+                <label>{{item.label}}</label>
+              </ng-template>
+
+            </c-item>
+          </angular2-multiselect>
+          <span class="text-error" *ngIf="addItemForm.get('itemId')?.errors !== null && addItemForm.get('itemId')?.errors?.empty === 'empty'">اسم الصنف مطلوب</span>
+
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-4">
+          <label class="text-muted">الكليه
+            <span class="text-error">*</span>
+          </label>
+          <angular2-multiselect  id="PlaceId_FK"  *ngIf="places" [data]="places" (keyup.Tab)="focusPlaceAdd($event)" (onOpen)="checkPlaceValueAdd(addItemForm.get('PlaceId_FK'))" (onSelect)="changeFaculty(addItemForm.get('PlaceId_FK').value[0].value)" [settings]="dropdownSettings" formControlName="PlaceId_FK">
+            <c-item>
+              <ng-template let-item="item">
+                <label>{{item.label}}</label>
+              </ng-template>
+
+            </c-item>
+          </angular2-multiselect>
+          <span class="text-error" *ngIf="addItemForm.get('PlaceId_FK')?.errors !== null && addItemForm.get('PlaceId_FK')?.errors?.empty === 'empty'">اسم الكليه مطلوبه</span>
+        </div>
+        <div class="form-group col-md-4">
+          <label class="text-muted">الدور
+            <span class="text-error">*</span>
+          </label>
+          <angular2-multiselect  id="FloorId_FK"  *ngIf="floors" [data]="floors" (keyup.Tab)="focusFloorAdd($event)" (onOpen)="checkFloorValueAdd(addItemForm.get('FloorId_FK'))" (onSelect)="changeFloor(addItemForm.get('FloorId_FK').value[0].value)" [settings]="dropdownSettings" formControlName="FloorId_FK">
+            <c-item>
+              <ng-template let-item="item">
+                <label>{{item.label}}</label>
+              </ng-template>
+
+            </c-item>
+          </angular2-multiselect>
+          <span class="text-error" *ngIf="addItemForm.get('FloorId_FK')?.errors !== null && addItemForm.get('FloorId_FK')?.errors?.empty === 'empty'">الدور مطلوب</span>
+        </div>
+        <div class="form-group col-md-4">
+          <label class="text-muted">المعمل
+            <span class="text-error">*</span>
+
+          </label>
+          <angular2-multiselect  id="OfficeId_FK"  *ngIf="offices" [data]="offices" (keyup.Tab)="focusOfficeAdd($event)" (onOpen)="checkOfficeValueAdd(addItemForm.get('OfficeId_FK'))" [settings]="dropdownSettings" formControlName="OfficeId_FK">
+            <c-item>
+              <ng-template let-item="item">
+                <label>{{item.label}}</label>
+              </ng-template>
+
+            </c-item>
+          </angular2-multiselect>
+          <span class="text-error" *ngIf="addItemForm.get('OfficeId_FK')?.errors !== null && addItemForm.get('OfficeId_FK')?.errors?.empty === 'empty'">المعمل مطلوب</span>
+        </div>
+      </div>
+
+
+      <div class="form-row">
+
+        <div class="form-group col-md-6 mt-md-4">
+          اللغه
+          <span class="text-error">*</span>
+          <div class="custom-control custom-radio custom-control-inline">
+            <input type="radio" id="customRadioInline1" name="lang" class="custom-control-input">
+            <label class="custom-control-label" for="customRadioInline1">عربي</label>
+          </div>
+          <div class="custom-control custom-radio custom-control-inline">
+            <input type="radio" id="customRadioInline2" name="lang" class="custom-control-input">
+            <label class="custom-control-label" for="customRadioInline2">انجليزي</label>
+          </div>
+        </div>
+        <div class="form-group col-md-6">
+          <label for="count" class="text-muted">العدد
+            <span class="text-error">*</span>
+          </label>
+          <input type="number" min="1" class="form-control" required id="count">
+
+        </div>
+      </div>
+
+
+    </form>
+
+        <div class="row" style="background-color: #dee2e6; padding: 10px; margin-top: 30px">
+          <div class="col-sm-12 text-left">
+            <button type="submit" form="addItemForm" class="btn btn-success btn-sm">
+      <span>
+
+                حفظ
+      </span>
+            </button>
+            <button type="button" class="btn btn-danger btn-sm" [ngClass]="translate.currentLang === 'ar' ? 'mr-1' : 'ml-1'">
+      <span>
+
+                تفريغ
+      </span>
+            </button>
+          </div>
+
+        </div>
+
+    </div>
+
+  </div>
+</div>
+

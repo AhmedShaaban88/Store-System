@@ -1,0 +1,14 @@
+<app-header *ngIf="showHead" >
+
+</app-header>
+
+<div class="container-all" [ngStyle]="{'min-height': clientHeight + 'px'}">
+  <router-outlet>
+  </router-outlet>
+</div>
+
+<app-footer>
+
+</app-footer>
+
+

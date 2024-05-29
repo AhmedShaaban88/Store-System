@@ -1,0 +1,346 @@
+
+<div class="jumbotron jumbotron-fluid">
+
+  <div class="page-container">
+    <div class="row">
+      <div class="col-sm-8">
+        <h4 class="text-store-lang"> المرتجعات</h4>
+
+      </div>
+      <div class="col-sm-4 text-store-lang-inverse">
+
+        <button type="button" class="btn text-white btn-sm" routerLink="add-returns"><span><i class="fa fa-plus"></i> </span> اضافه محضر مرتجع </button>
+      </div>
+      </div>
+    </div>
+  </div>
+
+
+<div class="container-fluid filter-container p-3">
+  <p class="text-muted">
+    <span class="small">قم بالضغط علي البحث للبحث عن نتيجه معينه او علي تصفيه للحصول علي عدد معين من النتائج</span><br>
+  </p>
+  <div class="row">
+    <div class="col-sm-6">
+      <button type="button" class="btn btn-light" (click)="search=true;filter=false;"><span>البحث</span>
+        <span [ngClass]="translate.currentLang ==='ar' ? 'mr-4' : 'ml-4'">
+          <i class="fa fa-search"></i> </span></button>
+    </div>
+    <div class="col-sm-6 text-store-lang-inverse">
+      <button type="button" class="btn btn-light" (click)="filter=true;search=false;"><span>تصفيه</span>
+        <span [ngClass]="translate.currentLang ==='ar' ? 'mr-4' : 'ml-4'">
+          <i class="fa fa-filter"></i> </span></button>
+    </div>
+  </div>
+
+  <div class='row' *ngIf="search">
+    <div class='col-md-6 search-container'>
+      <div class='search-box'>
+        <form class='search-form'>
+          <input class='form-control' placeholder='كلمه البحث هنا' type='text'>
+          <button class='btn btn-link search-btn'>
+            <i class='fa fa-search'></i>
+          </button>
+        </form>
+
+      </div>
+    </div>
+  </div>
+  <div class='row' *ngIf="filter">
+    <div class='col-md-6 form-container'>
+    <div >
+      <input type="text"
+             placeholder="تاريخ المحضر"
+             class="form-control"
+             bsDatepicker
+             #dp=bsDatepicker
+             (focus)="dp.show()"
+      >
+    </div>
+    </div>
+  </div>
+
+</div>
+<div class="container ">
+  <div class="row">
+    <div class="table-responsive data-table">
+      <table class="table table-bordered table-sm table-hover">
+        <caption>المرتجعات</caption>
+        <thead>
+        <tr>
+          <th scope="col" (click)="sort($event.target)">
+            <span>
+              <i class="fa"></i>
+            </span>
+            المسلسل</th>
+          <th scope="col" (click)="sort($event.target)">
+            <span>
+              <i class="fa"></i>
+            </span>
+
+            اسم محضر المرتجع
+          </th>
+          <th scope="col" (click)="sort($event.target)">
+            <span>
+              <i class="fa"></i>
+            </span>
+            تاريخ المحضر</th>
+          <th scope="col" (click)="sort($event.target)">
+            <span>
+              <i class="fa"></i>
+            </span>
+           اسم محضر الصيانه المرتجع منه</th>
+          <th scope="col">
+            الاجراءات</th>
+        </tr>
+        </thead>
+        <ng-container *ngIf="allReturns">
+        <tbody>
+        <tr *ngFor="let item of allReturns.m_Item1;let i = index">
+          <th scope="row">{{i+1}}</th>
+          <td>{{item.RecievedFromMaintanceName}}</td>
+          <!--[ngStyle]="{ 'direction' : (translate.currentLang === 'ar')? 'ltr' : 'rtl' }"-->
+          <td >{{item.RecievedFromMaintanceDate| date:'dd/MM/yyyy'}}</td>
+          <td >{{item.MaintenanceOrderName}}</td>
+          <td>
+            <div class="dropdown">
+              <button class="btn dropdown-toggle" type="button" id="more-options" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-ellipsis-h"></i>
+                <i class="fa fa-caret-down" [ngClass]="translate.currentLang ==='ar' ? 'mr-1' : 'ml-1'"></i>
+              </button>
+
+              <div class="dropdown-menu text-store-lang" aria-labelledby="more-options">
+                <button type="button" class="btn btn-sm text-primary dropdown-item" data-toggle="modal" data-target="#edit-item" (click)="editItem(item);;currentEditableRow = i">
+                  <i class="fa fa-pencil"></i>
+
+                  {{"tables.edit" | translate}}
+
+                </button>
+                <button type="button" class="btn btn-sm text-danger dropdown-item" data-toggle="modal" data-target="#delete-item" (click)="selectedItem= item">
+                  <i class="fa fa-trash"></i>
+                  {{"tables.delete" | translate}}
+                </button>
+
+              </div>
+            </div>
+          </td>
+
+
+        </tr>
+
+
+        </tbody>
+        </ng-container>
+        <tfoot class="bg-white" *ngIf="allReturns?.m_Item1.length > 0">
+        <tr>
+          <td colspan="8">              {{"tables.from" | translate}}
+            1               {{"tables.to" | translate}}
+            {{allReturns?.m_Item1.length}}               {{"tables.from" | translate}}
+            {{allReturns?.m_Item2}}</td>
+        </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+<div class="d-flex justify-content-center" *ngIf="!allReturns || spinnerMoreData">
+  <div class="spinner-border" role="status">
+    <span class="sr-only">Loading...</span>
+  </div>
+</div>
+<div class="d-flex justify-content-center" *ngIf="allReturns?.m_Item1.length === 0">
+  <div>
+    <h6 class="text-danger">{{"tables.no-data" | translate}}</h6>
+  </div>
+</div>
+
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="edit-item" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">تعديل المرتجع</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container p-2" style="flex-direction: column;">
+          <form (keydown.enter)="$event.preventDefault()" [formGroup]="addItemForm" id="addItemForm" (ngSubmit)="addItemSubmit()">
+            <div class="row">
+              <div class="col-sm-4">
+                <div class="form-group">
+                  <label for="RecievedFromMaintanceName" class="text-muted">اسم المحضر
+                  </label>
+                  <input type="text" class="form-control" tabindex="-1" readonly  formControlName="RecievedFromMaintanceName" id="RecievedFromMaintanceName" placeholder="رقم طلب التحويل">
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="form-group">
+                  <label for="RecievedFromMaintanceDate" class="text-muted">تاريخ المحضر
+                    <span class="text-error">*</span>
+                  </label>
+                  <input type="text"
+                         placeholder="تاريخ الطلب"
+                         class="form-control"
+                         id="RecievedFromMaintanceDate"
+                         bsDatepicker
+                         #dp=bsDatepicker
+                    
+                         (focus)="dp.show()"
+                         readonly
+                         formControlName="RecievedFromMaintanceDate" required>
+                  <span class="text-error" *ngIf="addItemForm.get('RecievedFromMaintanceDate').touched && addItemForm.get('RecievedFromMaintanceDate').invalid">تاريخ الطلب مطلوب</span>
+                </div>
+              </div>
+
+
+
+
+              <div class="col-sm-4">
+                <div class="form-group">
+                  <label for="MaintenanceOrderId_FK" class="text-muted">اسم محضر الصيانه
+                    <span class="text-error">*</span>
+                  </label>
+                  <angular2-multiselect [(ngModel)]="addItemForm.get('MaintenanceOrderId_FK').value"  [loading] = "loadingFrom" id="MaintenanceOrderId_FK"  (onScrollToEnd)="loadMoreMaintainace($event)"  *ngIf="allMaintainaces && maintainanceOrderId" [data]="allMaintainaces?.m_Item1" [settings]="dropdownSettings" (onSelect)="changeMaintainace($event)" formControlName="MaintenanceOrderId_FK" (keyup.Tab)="focusMaintaince($event)" (onOpen)="checkMaintainaceValue(addItemForm.get('MaintenanceOrderId_FK').value)" >
+                    <c-search>
+                      <ng-template>
+                        <input type="text" (keyup)="onSearch($event)" [placeholder]="translate.currentLang === 'ar' ?  'كلمه البحث' : 'Search'"/>
+                      </ng-template>
+                    </c-search>
+                    <c-item>
+                      <ng-template let-item="item">
+                        <label>{{item.label}}</label>
+                      </ng-template>
+
+                    </c-item>
+                  </angular2-multiselect>
+                  <span class="text-error" *ngIf="addItemForm.get('MaintenanceOrderId_FK').value.length === 0 && visitedMaintainace">اسم محضر الصيانه مطلوب</span>
+
+
+                </div>
+              </div>
+
+            </div>
+            <div class="row p-2">
+              <div class="col-sm-12 text-center" *ngIf="addItemForm.get('MaintenanceOrderId_FK').value.length > 0 && allItems?.m_Item1.length === 0">
+                <p class="text-error">تم رجوع كل البيانات من هذا المحضر</p>
+              </div>
+              <div style="width: 100%" *ngIf="addItemForm.get('MaintenanceOrderId_FK').value.length > 0 && allItems?.m_Item1.length > 0">
+                <table class="table table-bordered table-sm" >
+                  <thead>
+                  <tr>
+                    <th scope="col">
+
+                      <div class="custom-control custom-checkbox">
+                        <input *ngIf="returnsItems.length > 0" (change)="checkAllBoxes()" type="checkbox" class="custom-control-input" id="checkAll">
+                        <label class="custom-control-label" for="checkAll">
+                          <span id="checkAllLabel" (click)="checkAllBoxes()">تحديد الكل</span>
+                        </label>
+                      </div>
+                    </th>
+                    <th scope="col">
+                      كود الصنف</th>
+                    <th scope="col">
+
+                      اسم الصنف
+                    </th>
+                    <th scope="col">
+                      من مخزن</th>
+                    <th scope="col">
+                      الي مخزن</th>
+                    <th scope="col" class="text-center" colspan="2">
+                      <span>الكميه</span><br>
+                      <span>الكرتونه</span>
+                      <span>/</span>
+                      <span>العدد</span>
+
+                    </th>
+                  </tr>
+                  </thead>
+                  <tbody formArrayName="RecievedDatalist">
+                  <ng-container *ngFor="let details of addItemForm.get('RecievedDatalist')['controls']; let i = index;" >
+                    <tr [formGroupName]="i" [ngClass]="{'bg-danger': (zeroRow === i), 'bg-warning': errorRows.indexOf(i) > -1 , 'bg-white': (errorRows.indexOf(i) === -1 && zeroRow !== i) }">
+                      <td class="column-divided-table check-box">
+                        <div class="custom-control custom-checkbox">
+                          <input (change)="checkOneBox(i, details.get('ItemsId_FK').value, details.get('RecievedMaintanceStockId_From_FK').value, details.get('RecievedMaintanceStockId_To_FK').value)" [disabled]="(zeroRow !== -1 && zeroRow !== i)" type="checkbox" [checked]="details.get('status').value" class="custom-control-input" [id]="i">
+                          <label class="custom-control-label" [htmlFor]="i">
+                            <span class="check-span">تحديد </span>
+                          </label>
+                        </div>
+                      </td>
+                      <td class="column-divided-table">
+                        <div class="form-group">
+                          <span>{{details.get('ItemsCode').value}}</span>
+                        </div>
+                      </td>
+                      <td class="column-divided-table">
+                        <div class="form-group">
+                          <span>{{details.get('ItemsName').value}}</span>
+                        </div>
+                      </td>
+                      <td class="column-divided-table">
+                        <div class="form-group">
+                          <span>{{details.get('StockFromName').value}}</span>
+                        </div>
+                      </td>
+                      <td class="column-divided-table">
+                        <div class="form-group">
+                          <span>{{details.get('StockToName').value}}</span>
+                        </div>
+                      </td>
+
+
+                      <td class="column-divided">
+                        <input type="number" min="0" class="form-control"  formControlName="RecievedFromMaintanceItemsQuantityBox" required id="items-count" [readOnly]="(zeroRow !== -1 && zeroRow !== i)" (change)="checkAvailabiltyQuantity(details.get('RecievedMaintanceStockId_From_FK').value, details.get('RecievedMaintanceStockId_To_FK').value, details.get('ItemsId_FK').value, addItemForm.get('MaintenanceOrderId_FK').value[0]?.value, details.get('RecievedFromMaintanceItemsQuantityBox').value, details.get('RecievedFromMaintanceItemsQuantityNumber').value, i, recieveId)">
+                        <ng-container *ngIf="details.get('RecievedFromMaintanceItemsQuantityBox').touched && details.get('RecievedFromMaintanceItemsQuantityBox').errors">
+                          <span class="text-error" *ngIf="details.get('RecievedFromMaintanceItemsQuantityBox').touched && details.get('RecievedFromMaintanceItemsQuantityBox').errors.required">عدد العناصر مطلوب</span>
+                          <span class="text-error" *ngIf="details.get('RecievedFromMaintanceItemsQuantityBox').errors.min">عدد العناصر لابد ان يكون رقم صحيح</span>
+                        </ng-container>
+                      </td>
+                      <td class="column-divided">
+                        <input type="number" min="0" class="form-control" formControlName="RecievedFromMaintanceItemsQuantityNumber" required [readOnly]="(zeroRow !== -1 && zeroRow !== i)" (change)="checkAvailabiltyQuantity(details.get('RecievedMaintanceStockId_From_FK').value, details.get('RecievedMaintanceStockId_To_FK').value, details.get('ItemsId_FK').value, addItemForm.get('MaintenanceOrderId_FK').value[0]?.value, details.get('RecievedFromMaintanceItemsQuantityBox').value, details.get('RecievedFromMaintanceItemsQuantityNumber').value, i, recieveId)">
+                        <ng-container *ngIf="details.get('RecievedFromMaintanceItemsQuantityNumber').touched && details.get('RecievedFromMaintanceItemsQuantityNumber').errors">
+                          <span class="text-error" *ngIf="details.get('RecievedFromMaintanceItemsQuantityNumber').touched && details.get('RecievedFromMaintanceItemsQuantityNumber').errors.required">عدد العناصر مطلوب</span>
+                          <span class="text-error" *ngIf="details.get('RecievedFromMaintanceItemsQuantityNumber').errors.min">عدد العناصر لابد ان يكون رقم صحيح</span>
+                        </ng-container>
+                      </td>
+                    </tr>
+                  </ng-container>
+                  </tbody>
+                </table>
+              </div>
+
+
+
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" form="addItemForm" class="btn btn-success btn-sm" [disabled]="zeroRow !== -1 || returnsItems.length === 0">حفظ</button>
+
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">اغلاق</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="delete-item" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div><h5 class="modal-title text-center">حذف تحويل</h5></div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="text-center">هل انت متأكد من حذف المرتجع بشكل نهائي ؟ </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger btn-sm" (click)="deleteItem()">حذف</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">اغلاق</button>
+      </div>
+    </div>
+  </div>
+</div>
+

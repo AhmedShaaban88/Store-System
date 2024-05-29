@@ -1,0 +1,321 @@
+<div class="jumbotron jumbotron-fluid">
+
+  <div class="page-container">
+    <div class="row">
+      <div class="col-sm-8">
+        <h4 class="text-store-lang">الاصناف</h4>
+
+      </div>
+      <div class="col-sm-4 text-store-lang-inverse">
+
+        <button type="button" class="btn text-white btn-sm" data-toggle="modal" data-target="#add-item" (click)="loadAllCategories('add')"><span><i class="fa fa-plus"></i> </span> اضافه صنف </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="container-fluid filter-container p-3">
+  <p class="text-muted">
+    <span class="small">قم بالبحث بكلمه معينه للحصول علي نتائج هذه الكلمه</span><br>
+  </p>
+
+  <div class='row'>
+    <div class='col-md-6 search-container'>
+      <div class='search-box'>
+        <form class='search-form'>
+          <input class='form-control' placeholder='كلمه البحث هنا' type='text'>
+          <button class='btn btn-link search-btn'>
+            <i class='fa fa-search'></i>
+          </button>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+<div class="container ">
+  <div class="row">
+    <div class="table-responsive data-table">
+      <table class="table table-bordered table-sm table-hover">
+        <caption>الاصناف</caption>
+        <thead>
+        <tr>
+          <th scope="col" (click)="sort($event.target)">
+            <span>
+              <i class="fa"></i>
+            </span>
+            المسلسل</th>
+          <th scope="col" (click)="sort($event.target)">
+            <span>
+              <i class="fa"></i>
+            </span>
+
+            الكود
+          </th>
+          <th scope="col" (click)="sort($event.target)">
+            <span>
+              <i class="fa"></i>
+            </span>
+            اسم الصنف </th>
+          <th scope="col" (click)="sort($event.target)">
+            <span>
+              <i class="fa"></i>
+            </span>
+           الفئه</th>
+          <th scope="col" (click)="sort($event.target)">
+            <span>
+              <i class="fa"></i>
+            </span>
+           العبوه</th>
+          <th scope="col" (click)="sort($event.target)">
+            <span>
+              <i class="fa"></i>
+            </span>
+            ملاحظات</th>
+          <th scope="col" (click)="sort($event.target)">
+            <span>
+              <i class="fa"></i>
+            </span>
+            مواصفات</th>
+          <th scope="col">
+            الاجراءات</th>
+        </tr>
+        </thead>
+        <ng-container *ngIf="items">
+        <tbody >
+        <tr *ngFor="let item of items.m_Item1;let i = index">
+          <th scope="row">{{i+1}}</th>
+          <td>{{item.ItemsCode}}</td>
+          <td>{{item.ItemsName}}</td>
+          <td>{{translate.currentLang === "en" ? item.CategoryNameEn : item.CategoryNameAr}}</td>
+          <td>{{item.ItemBoxQuantity}}</td>
+          <td><p  [tooltip]="item.ItemNote">{{item.ItemNote ? item.ItemNote : "tables.not-found" | translate}}</p></td>
+          <td><p [tooltip]="item.ItemSpecification">{{item.ItemSpecification ? item.ItemSpecification :  "tables.not-found" | translate}}</p></td>
+
+          <td>
+            <div class="dropdown">
+              <button class="btn dropdown-toggle" type="button" id="more-options" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-ellipsis-h"></i>
+                <i class="fa fa-caret-down" [ngClass]="translate.currentLang ==='ar' ? 'mr-1' : 'ml-1'"></i>
+              </button>
+
+              <div class="dropdown-menu text-store-lang" aria-labelledby="more-options">
+                <button type="button" class="btn btn-sm text-primary dropdown-item" data-toggle="modal" data-target="#update-item" (click)="updateForm(item, i)">
+                  <i class="fa fa-pencil"></i>
+
+                  {{"tables.edit" | translate}}
+
+                </button>
+                <button type="button" class="btn btn-sm text-danger dropdown-item"  data-toggle="modal" data-target="#delete-item" (click)="selectedItem= item">
+                  <i class="fa fa-trash"></i>
+
+                  {{"tables.delete" | translate}}
+                </button>
+
+              </div>
+            </div>
+          </td>
+
+
+
+        </tr>
+
+
+        </tbody>
+
+        <tfoot class="bg-white" *ngIf="items?.m_Item1.length > 0">
+        <tr>
+          <td colspan="8">              {{"tables.from" | translate}}
+            1               {{"tables.to" | translate}}
+            {{items.m_Item1.length}}               {{"tables.from" | translate}}
+            {{items.m_Item2}}</td>
+        </tr>
+        </tfoot>
+        </ng-container>
+
+      </table>
+    </div>
+
+  </div>
+</div>
+<div class="d-flex justify-content-center" *ngIf="!items || spinnerMoreData">
+  <div class="spinner-border" role="status">
+    <span class="sr-only">Loading...</span>
+  </div>
+</div>
+<div class="d-flex justify-content-center" *ngIf="items?.m_Item1.length === 0">
+  <div>
+    <h6 class="text-danger">{{"tables.no-data" | translate}}</h6>
+  </div>
+</div>
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="add-item" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">اضافه صنف</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="resetSearchAdd()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form (keydown.enter)="$event.preventDefault()" [formGroup]="addItemForm" id="addItemForm" (ngSubmit)="addItemSubmit()">
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="name-item" class="text-muted">اسم الصنف
+              <span class="text-error">*</span>
+              </label>
+              <input type="text" class="form-control" formControlName="name" required id="name-item" placeholder="اسم الصنف">
+            <span class="text-error" *ngIf="addItemForm.get('name').touched && addItemForm.get('name').invalid">اسم الصنف مطلوب</span>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="items-count" class="text-muted">العبوه
+                <span class="text-error">*</span>
+              </label>
+              <input type="number" (change)="checkCountAdd(addItemForm.controls['count'].value)" min="1" class="form-control" formControlName="count" required id="items-count">
+              <ng-container *ngIf="addItemForm.controls['count'].touched && addItemForm.controls['count'].errors">
+              <span class="text-error" *ngIf="addItemForm.controls['count'].touched && addItemForm.controls['count'].errors.required">عدد العناصر مطلوب</span>
+              <span class="text-error" *ngIf="addItemForm.controls['count'].errors.min"> عدد العناصر لابد ان يكون رقم صحيح اكبر من صفر</span>
+              </ng-container>
+            </div>
+          </div>
+          <div class="form-row">
+
+            <div class="form-group col-md-12" >
+              <label class="text-muted">الفئه
+                <span class="text-error">*</span>
+              </label>
+              <angular2-multiselect  [loading] = "loading" id="categoryAr"  (onScrollToEnd)="loadMoreData($event)"  *ngIf="allCategories" [data]="allCategories?.m_Item1" (keyup.Tab)="focusCategory($event)" (onOpen)="checkCategory(addItemForm.get('categoryAr'))" [settings]="dropdownSettings" formControlName="categoryAr">
+                <c-search>
+                  <ng-template>
+                    <input type="text" (keyup)="onSearchCategory($event)" [placeholder]="translate.currentLang === 'ar' ?  'كلمه البحث' : 'Search'"/>
+                  </ng-template>
+                </c-search>
+                <c-item>
+                  <ng-template let-item="item">
+                    <label>{{item.label}}</label>
+                  </ng-template>
+
+                </c-item>
+              </angular2-multiselect>
+              <span class="text-error" *ngIf="addItemForm.get('categoryAr')?.errors !== null && addItemForm.get('categoryAr')?.errors === 'empty'">الفئه مطلوبه</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="notes">الملاحظات</label>
+            <textarea class="form-control"  formControlName="note" id="notes" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="spec">المواصفات</label>
+            <textarea class="form-control"  formControlName="specification" id="spec" rows="3"></textarea>
+          </div>
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-success btn-sm" form="addItemForm" [disabled]="addItemForm.invalid || zeroCountAdd">حفظ</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" (click)="resetSearchAdd()">اغلاق</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="delete-item" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div><h5 class="modal-title text-center">حذف صنف</h5></div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="text-center">هل انت متأكد من حذف الصنف بشكل نهائي ؟ </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger btn-sm" (click)="deleteItem()">حذف</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">اغلاق</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="update-item" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">تعديل صنف</h5>
+        <button type="button" class="close" data-dismiss="modal" (click)="resetSearchEdit()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form (keydown.enter)="$event.preventDefault()" [formGroup]="updateItemForm" id="updateItemForm" (ngSubmit)="updateItemSubmit()">
+          <div class="form-row">
+            <div class="form-group col-md-12">
+              <label for="code-item" class="text-muted">كود الصنف
+              </label>
+              <input type="number" readonly="readonly" value={{itemCode}} class="form-control" id="code-item">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="name-item-update" class="text-muted">اسم الصنف
+                <span class="text-error">*</span>
+              </label>
+              <input type="text" class="form-control" formControlName="name" required id="name-item-update" placeholder="اسم الصنف">
+              <span class="text-error" *ngIf="updateItemForm.get('name').touched && updateItemForm.get('name').invalid">اسم الصنف مطلوب</span>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="items-count-update" class="text-muted">العبوه
+                <span class="text-error">*</span>
+              </label>
+              <input type="number" min="1" class="form-control" formControlName="count" required id="items-count-update">
+              <ng-container *ngIf="updateItemForm.controls['count'].touched && updateItemForm.controls['count'].errors">
+                <span class="text-error" *ngIf="updateItemForm.controls['count'].touched && updateItemForm.controls['count'].errors.required">عدد العناصر مطلوب</span>
+                <span class="text-error" *ngIf="updateItemForm.controls['count'].errors.min">عدد العناصر لابد ان يكون رقم صحيح اكبر من صفر</span>
+              </ng-container>
+            </div>
+          </div>
+          <div class="form-row">
+
+            <div class="form-group col-md-12" >
+              <label class="text-muted">الفئه
+                <span class="text-error">*</span>
+              </label>
+              <angular2-multiselect [(ngModel)]="itemCategory" [loading] = "loadingEdit" id="categoryArEdit"  (onScrollToEnd)="loadMoreDataEdit($event)"  *ngIf="allCategoriesEdit" [data]="allCategoriesEdit?.m_Item1" (keyup.Tab)="focusCategoryEdit($event)" (onOpen)="checkCategoryEdit(updateItemForm.get('categoryAr'))" [settings]="dropdownSettings" formControlName="categoryAr">
+                <c-search>
+                  <ng-template>
+                    <input type="text" (keyup)="onSearchCategoryEdit($event)" [placeholder]="translate.currentLang === 'ar' ?  'كلمه البحث' : 'Search'"/>
+                  </ng-template>
+                </c-search>
+                <c-item>
+                  <ng-template let-item="item">
+                    <label>{{item.label}}</label>
+                  </ng-template>
+
+                </c-item>
+              </angular2-multiselect>
+              <span class="text-error" *ngIf="updateItemForm.get('categoryAr')?.errors !== null && updateItemForm.get('categoryAr')?.errors === 'empty'">الفئه مطلوبه</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="notes-update">الملاحظات</label>
+            <textarea class="form-control"  formControlName="note" id="notes-update" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="spec-update">المواصفات</label>
+            <textarea class="form-control"  formControlName="specification" id="spec-update" rows="3"></textarea>
+          </div>
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-success btn-sm" form="updateItemForm" [disabled]="updateItemForm.invalid || zeroCountEdit">حفظ</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" (click)="resetSearchEdit()">اغلاق</button>
+      </div>
+    </div>
+  </div>
+</div>
+

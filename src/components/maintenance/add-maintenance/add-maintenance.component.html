@@ -1,0 +1,188 @@
+<app-search-bar id="search-container" class="hidden" [from]="'transform'" (searchValue)="getValue($event)"></app-search-bar>
+
+<div class="jumbotron jumbotron-fluid">
+
+  <div class="page-container">
+    <div class="row">
+      <div class="col-sm-8">
+        <h4 class="text-store-lang">اضافه محضر صيانه</h4>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="container-fluid filter-container">
+  <p class="text-muted">
+    <span class="small">قم بملئ الخانات الاتيه والتأكد من سلامه المعلومات المدخله والضغط علي حفظ</span><br>
+  </p>
+
+  <div class="d-flex justify-content-center" *ngIf="!maintainaceName">
+    <div class="spinner-border" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+  </div>
+<div class="container p-2" style="flex-direction: column;" *ngIf="maintainaceName">
+  <form (keydown.enter)="$event.preventDefault()" [formGroup]="addItemForm" id="addItemForm" (ngSubmit)="addItemSubmit()">
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="form-group">
+          <label  class="text-muted">رقم المحضر
+          </label>
+          <input type="text" class="form-control" formControlName="maintenaceName" tabindex="-1"  readonly [value]="maintainaceName" placeholder="رقم المحضر">
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <div class="form-group">
+          <label class="text-muted">تاريخ المحضر
+            <span class="text-error">*</span>
+          </label>
+          <input type="text"
+                 placeholder="تاريخ الطلب"
+                 class="form-control"
+                 id="maintenanceDate"
+                 bsDatepicker
+                 #dp=bsDatepicker
+                 [bsValue]="today"
+                 (focus)="dp.show()"
+                 formControlName="maintenanceDate"
+                 readonly
+                 required>
+        </div>
+      </div>
+
+
+
+    </div>
+    <div class="row p-2">
+
+      <div style="width: 100%">
+        <table class="table table-bordered table-sm">
+          <thead>
+          <tr>
+            <th scope="col">
+              كود الصنف</th>
+            <th scope="col">
+
+              اسم الصنف
+            </th>
+            <th scope="col">
+              من مخزن</th>
+            <th scope="col">
+              الي مخزن</th>
+            <th scope="col" class="text-center" colspan="2">
+              <span>الكميه</span><br>
+              <span>الكرتونه</span>
+              <span>/</span>
+              <span>العدد</span>
+
+            </th>
+            <th scope="col">
+              الاجراءات</th>
+          </tr>
+          </thead>
+          <tbody formArrayName="itemsDetails">
+          <ng-container *ngFor="let details of addItemForm.get('itemsDetails').controls; let i = index;">
+            <tr [formGroupName]="i" [ngClass]="(duplicatedItem === i || sameStore === i ||errorRows.indexOf(i) > -1 || errorRow === i || zerosRow === i) ? 'bg-danger' : 'bg-white'">
+              <td class="column-divided-table">
+                <div class="form-group">
+                  <input type="text" class="form-control" formControlName="ItemsCode_FK" placeholder="كود الصنف" (dblclick)="openSearchBar(i)" (focus)="currentEditIndex = i" (keyup.Tab)="currentEditIndex = i" (change)="getItemName(details.get('ItemsCode_FK').value, details.get('ItemsId_FK'), details.get('StockName_To_FK'), i)">
+                </div>
+                <span class="text-error" *ngIf="details.get('ItemsCode_FK').touched && details.get('ItemsCode_FK').invalid">كود الصنف مطلوب</span>
+              </td>
+              <td class="column-divided-table">
+                <div class="form-group">
+                  <input *ngIf="translate.currentLang === 'ar'"  [ngStyle]="{'color': details.get('StockName_To_FK')?.value?.indexOf('لا يوجد') <= -1  ? 'black' : 'red' }" class="form-control" disabled [value]="details.get('StockName_To_FK')?.value" formControlName="StockName_To_FK">
+                  <input *ngIf="translate.currentLang === 'en'" [ngStyle]="{'color': details.get('StockName_To_FK')?.value?.indexOf('not found') <= -1  ? 'black' : 'red' }" class="form-control" disabled [value]="details.get('StockName_To_FK')?.value" formControlName="StockName_To_FK">
+                </div>
+              </td>
+              <td class="column-divided-table">
+                <div class="form-group">
+                  <angular2-multiselect  [loading] = "loadingFrom" id="stockIdFrom"  (onScrollToEnd)="loadMoreStockFrom($event)"  *ngIf="allStoresFrom" [data]="allStoresFrom?.m_Item1" [settings]="(duplicatedItem !== -1 && duplicatedItem !== i) ? disabledOption : dropdownSettings" formControlName="StockId_From_FK" (keyup.Tab)="focusStockFrom($event); currentEditIndex = i" (onOpen)="checkStoreFromValue(details.get('StockId_From_FK'), i)" (onSelect)="checkDuplicated(details.get('StockId_From_FK')?.value[0]?.value,details.get('StockId_To_FK')?.value[0]?.value, details.get('ItemsId_FK').value, i, details.get('maintenanceOrderQuantityBox').value, details.get('maintenanceOrderQuantityNumber').value)">
+                    <c-search>
+                      <ng-template>
+                        <input type="text" (keyup)="onSearch($event, i)" [placeholder]="translate.currentLang === 'ar' ?  'كلمه البحث' : 'Search'"/>
+                      </ng-template>
+                    </c-search>
+                    <c-item>
+                      <ng-template let-item="item">
+                        <label>{{item.label}}</label>
+                      </ng-template>
+
+                    </c-item>
+                  </angular2-multiselect>
+                  <span class="text-error" *ngIf="details.get('StockId_From_FK')?.errors !== null && details.get('StockId_From_FK')?.errors === 'empty'">اسم المخزن مطلوب</span>
+                </div>
+              </td>
+              <td class="column-divided-table">
+                <div class="form-group">
+                  <angular2-multiselect  [loading] = "loadingTo" id="stockIdTo"  (onScrollToEnd)="loadMoreStockTo($event)"  *ngIf="allStoresTo" [data]="allStoresTo?.m_Item1" [settings]="(duplicatedItem !== -1 && duplicatedItem !== i) ? disabledOption : dropdownSettings" formControlName="StockId_To_FK" (keyup.Tab)="focusStockTo($event); currentEditIndex = i" (onOpen)="checkStoreToValue(details.get('StockId_To_FK'), i)" (onSelect)="checkDuplicated(details.get('StockId_From_FK')?.value[0]?.value,details.get('StockId_To_FK')?.value[0]?.value, details.get('ItemsId_FK').value, i, details.get('maintenanceOrderQuantityBox').value, details.get('maintenanceOrderQuantityNumber').value)">
+                    <c-search>
+                      <ng-template>
+                        <input type="text" (keyup)="onSearchTo($event, i + 1)" [placeholder]="translate.currentLang === 'ar' ?  'كلمه البحث' : 'Search'"/>
+                      </ng-template>
+                    </c-search>
+                    <c-item>
+                      <ng-template let-item="item">
+                        <label>{{item.label}}</label>
+                      </ng-template>
+
+                    </c-item>
+                  </angular2-multiselect>
+                  <span class="text-error" *ngIf="details.get('StockId_To_FK')?.errors !== null && details.get('StockId_To_FK')?.errors === 'empty'">اسم المخزن مطلوب</span>
+                </div>
+              </td>
+
+              <td class="column-divided">
+                <input type="number" min="0" class="form-control" formControlName="maintenanceOrderQuantityBox" required id="items-count" [readOnly]="(!(details.get('ItemsId_FK')?.value && details.get('StockId_From_FK')?.value[0]?.value && details.get('StockId_To_FK')?.value[0]?.value) || (errorRow !== -1 && errorRow !== i) || duplicatedItem !== -1 || sameStore !== -1)" (change)="checkAvailabiltyQuantity(details.get('StockId_From_FK').value[0].value, details.get('StockId_To_FK').value[0].value, details.get('maintenanceOrderQuantityBox').value, details.get('maintenanceOrderQuantityNumber').value, details.get('ItemsId_FK').value, i)">
+                <ng-container *ngIf="details.get('maintenanceOrderQuantityBox').touched && details.get('maintenanceOrderQuantityBox').errors">
+                  <span class="text-error" *ngIf="details.get('maintenanceOrderQuantityBox').touched && details.get('maintenanceOrderQuantityBox').errors.required">عدد العناصر مطلوب</span>
+                  <span class="text-error" *ngIf="details.get('maintenanceOrderQuantityBox').errors.min">عدد العناصر لابد ان يكون رقم صحيح</span>
+                </ng-container>
+              </td>
+              <td class="column-divided">
+                <input type="number" min="0" class="form-control" formControlName="maintenanceOrderQuantityNumber" required [readOnly]="(!(details.get('ItemsId_FK')?.value && details.get('StockId_To_FK')?.value[0]?.value) || (errorRow !== -1 && errorRow !== i) || duplicatedItem !== -1 || sameStore !== -1)" (change)="checkAvailabiltyQuantity(details.get('StockId_From_FK').value[0].value, details.get('StockId_To_FK').value[0].value, details.get('maintenanceOrderQuantityBox').value, details.get('maintenanceOrderQuantityNumber').value, details.get('ItemsId_FK').value, i)">
+                <ng-container *ngIf="details.get('maintenanceOrderQuantityNumber').touched && details.get('maintenanceOrderQuantityNumber').errors">
+                  <span class="text-error" *ngIf="details.get('maintenanceOrderQuantityNumber').touched && details.get('maintenanceOrderQuantityNumber').errors.required">عدد العناصر مطلوب</span>
+                  <span class="text-error" *ngIf="details.get('maintenanceOrderQuantityNumber').errors.min">عدد العناصر لابد ان يكون رقم صحيح</span>
+                </ng-container>
+              </td>
+
+              <td>
+              <button *ngIf="details.get('ItemsCode_FK').touched && maintainaceItems.length > 1" type="button" class="btn btn-sm btn-danger" (click)="removeItem(i)" [disabled]="(duplicatedItem !== -1 && duplicatedItem !== i) || (sameStore !== -1 && sameStore !== i)">
+                <i class="fa fa-trash"></i>
+                حذف
+              </button>
+              </td>
+            </tr>
+          </ng-container>
+          </tbody>
+        </table>
+      </div>
+
+
+
+    </div>
+  </form>
+  <div class="row" style="background-color: #dee2e6; padding: 10px;">
+    <div class="col-sm-12 text-left">
+      <button type="submit" form="addItemForm" class="btn btn-success btn-sm" [disabled]="errorRow !== -1 || maintainaceItems.length === 0 || notFound || duplicatedItem !== -1 || zerosRow !== -1 || sameStore !== -1">
+      <span>
+
+                حفظ
+      </span>
+      </button>
+      <button type="button" form="addItemForm" class="btn btn-danger btn-sm" [disabled]="!addItemForm.touched" [ngClass]="translate.currentLang === 'ar' ? 'mr-1' : 'ml-1'" (click)="resetForm()">
+      <span>
+
+                تفريغ
+      </span>
+      </button>
+    </div>
+
+  </div>
+</div>
+</div>
+
+

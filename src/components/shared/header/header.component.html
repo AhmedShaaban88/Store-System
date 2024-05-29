@@ -1,0 +1,206 @@
+<!-- <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" (click)="changeRoute($event.target)" routerLink="/">{{"header.title" | translate}}</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavDropdown">
+    <ul class="navbar-nav">
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="transform" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {{"header.links.transform.title" | translate}}
+        </a>
+        <div class="dropdown-menu" aria-labelledby="transform">
+          <a class="dropdown-item text-store-lang" (click)="changeRoute($event.target)" routerLink="/transforms" routerLinkActive="active" [routerLinkActiveOptions]="{exact:
+true}">{{"header.links.transform.home" | translate}}</a>
+          <a class="dropdown-item text-store-lang" (click)="changeRoute($event.target)" routerLink="/transforms/add-transform" routerLinkActive="active" [routerLinkActiveOptions]="{exact:
+true}">{{"header.links.transform.add" | translate}}</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="supply" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {{"header.links.supply.title" | translate}}
+        </a>
+        <div class="dropdown-menu" aria-labelledby="supply">
+          <a class="dropdown-item text-store-lang" (click)="changeRoute($event.target)" href="#" routerLink="/supply" routerLinkActive="active" [routerLinkActiveOptions]="{exact:
+true}">{{"header.links.supply.home" | translate}}</a>
+          <a class="dropdown-item text-store-lang" (click)="changeRoute($event.target)" href="#" routerLink="/supply/add-supply" routerLinkActive="active" [routerLinkActiveOptions]="{exact:
+true}">{{"header.links.supply.add" | translate}}</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="maintenance" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {{"header.links.maintenance.title" | translate}}
+        </a>
+        <div class="dropdown-menu" aria-labelledby="maintenance">
+          <a class="dropdown-item text-store-lang" (click)="changeRoute($event.target)" href="#" routerLink="/maintenance" routerLinkActive="active" [routerLinkActiveOptions]="{exact:
+true}">{{"header.links.maintenance.home" | translate}}</a>
+          <a class="dropdown-item text-store-lang" (click)="changeRoute($event.target)" href="#" routerLink="/maintenance/add-maintenance" routerLinkActive="active" [routerLinkActiveOptions]="{exact:
+true}">{{"header.links.maintenance.add" | translate}}</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="damage" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {{"header.links.damage.title" | translate}}
+        </a>
+        <div class="dropdown-menu" aria-labelledby="maintenance">
+          <a class="dropdown-item text-store-lang" (click)="changeRoute($event.target)" href="#" routerLink="/damage" routerLinkActive="active" [routerLinkActiveOptions]="{exact:
+true}">{{"header.links.damage.home" | translate}}</a>
+          <a class="dropdown-item text-store-lang" (click)="changeRoute($event.target)" href="#" routerLink="/damage/add-damage" routerLinkActive="active" [routerLinkActiveOptions]="{exact:
+true}">{{"header.links.damage.add" | translate}}</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="returns" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {{"header.links.returns.title" | translate}}
+        </a>
+        <div class="dropdown-menu" aria-labelledby="maintenance">
+          <a class="dropdown-item text-store-lang" (click)="changeRoute($event.target)" href="#" routerLink="/returns" routerLinkActive="active" [routerLinkActiveOptions]="{exact:
+true}">{{"header.links.returns.home" | translate}}</a>
+          <a class="dropdown-item text-store-lang" (click)="changeRoute($event.target)" href="#" routerLink="/returns/add-returns" routerLinkActive="active" [routerLinkActiveOptions]="{exact:
+true}">{{"header.links.returns.add" | translate}}</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="settings" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {{"header.links.settings.title" | translate}}
+        </a>
+        <div class="dropdown-menu" aria-labelledby="settings">
+          <a class="dropdown-item text-store-lang" (click)="changeRoute($event.target)" routerLink="/settings/stock" routerLinkActive="active" [routerLinkActiveOptions]="{exact:
+true}">{{"header.links.settings.links.stocks" | translate}}</a>
+          <a class="dropdown-item text-store-lang" (click)="changeRoute($event.target)" href="#" routerLink="/settings/items" routerLinkActive="active" [routerLinkActiveOptions]="{exact:
+true}">{{"header.links.settings.links.items" | translate}}</a>
+          <a class="dropdown-item text-store-lang" (click)="changeRoute($event.target)" href="#" routerLink="/settings/categories" routerLinkActive="active" [routerLinkActiveOptions]="{exact:
+true}">{{"header.links.settings.links.categories" | translate}}</a>
+        </div>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#" (click)="changeRoute($event.target)" aria-haspopup="true" aria-expanded="false" routerLink="/print" routerLinkActive="active" [routerLinkActiveOptions]="{exact:
+true}">
+          {{"header.links.print.title" | translate}}
+        </a>
+      </li>
+      <li class="nav-item show-small" style="padding-top: 10px">
+        <a class="nav-link" href="#" (click)="changeRoute($event.target)" aria-haspopup="true" aria-expanded="false">
+          <i class="fa fa-bell-o"></i>
+        </a>
+      </li>
+      <li class="nav-item dropdown show-small">
+        <a class="nav-link dropdown-toggle" href="#" id="avatar-small" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <img alt="avatar" src="assets/images/avatar.png">
+        </a>
+        <div class="dropdown-menu" aria-labelledby="avatar-small">
+        </div>
+      </li>
+
+    </ul>
+
+  </div>
+  <ul class="navbar-nav navbar-left">
+    <li class="nav-item" style="padding-top: 10px">
+      <a class="nav-link" href="#" aria-haspopup="true" aria-expanded="false">
+        <i class="fa fa-bell-o"></i>
+      </a>
+    </li>
+    <li class="nav-item dropdown" >
+      <a class="nav-link dropdown-toggle" href="#" id="avatar" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <img alt="avatar" src="assets/images/avatar.png">
+      </a>
+      <div class="dropdown-menu" aria-labelledby="avatar">
+      </div>
+    </li>
+
+  </ul>
+</nav> -->
+<nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand"
+   (click)="changeRoute($event.target)"
+    routerLink="/" 
+    *ngFor="let ModuleData of UserModuleDataArr;"
+    [innerHTML]="Language ==='True' ?ModuleData.ModuleNameAr :ModuleData.ModuleNameEn" >
+   <!-- {{"header.title" | translate}} -->
+   {{ModuleData.ModuleNameAr}}
+    </a>
+  <button class="navbar-toggler" type="button"
+   data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+   <!-- ده جزء المحاضر والعنوان م-->
+  <div class="collapse navbar-collapse" id="navbarNavDropdown">
+    <ul class="navbar-nav"  >
+     <li class="nav-item dropdown" 
+       *ngFor="let UserModuleCategoryData of UserModuleCategoryDataArr; index as i">
+ <a class="nav-link dropdown-toggle" 
+ href="#"  id="transform" 
+ data-toggle="dropdown" aria-haspopup="true"
+  aria-expanded="false"
+  [innerHTML]="Language ==='True' ? UserModuleCategoryData.ModuleCategoryNameAr :UserModuleCategoryData.ModuleCategoryNameEn">
+    </a>
+
+  <div class="dropdown-menu" aria-labelledby="transform">
+  <a class="dropdown-item text-store-lang" 
+   (click)="changeRoute($event.target)"  
+
+   routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}"
+   [routerLink]="UserPageData.PageAuthorizeUrl" 
+    *ngFor="let UserPageData of  filterPage(UserModuleCategoryData.ModuleCategoryId); index as i"
+   [innerHTML]="Language ==='True' ? UserPageData.PageAuthorizeNameAr :UserPageData.PageAuthorizeNameEn"
+
+   > 
+
+   </a>
+  <!-- <a class="dropdown-item text-store-lang" (click)="changeRoute($event.target)" routerLink="/transforms/add-transform" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">{{"header.links.transform.add" | translate}}</a> -->
+    </div>
+    </li>
+      <li class="nav-item show-small" style="padding-top: 10px">
+        <a class="nav-link" href="#" 
+        (click)="changeRoute($event.target)" 
+        aria-haspopup="true" aria-expanded="false">
+          <i class="fa fa-bell-o"></i>
+        </a>
+      </li>
+      <li class="nav-item dropdown show-small">
+        <a class="nav-link dropdown-toggle" href="#" id="avatar-small" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <img alt="avatar" src="assets/images/avatar.png">
+         <!-- [src] ="ImageUserPath" -->
+        
+        </a>
+        <div class="dropdown-menu" aria-labelledby="avatar-small">
+
+        </div>
+      </li>
+
+    </ul>
+
+  </div>
+  <!-- ده جزء الجرس وصوره المستخدم-->
+  <ul class="navbar-nav navbar-left">
+    <li class="nav-item" style="padding-top: 10px">
+      <a class="nav-link" href="#" aria-haspopup="true" aria-expanded="false">
+        <i class="fa fa-bell-o"></i>
+      </a>
+    </li>
+    <li class="nav-item dropdown" >
+      <a class="nav-link dropdown-toggle" href="#" id="avatar" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <img alt="avatar" src="assets/images/avatar.png">
+      </a>
+      <div class="dropdown-menu" aria-labelledby="avatar">
+        <button type="button" class="btn btn-sm text-danger dropdown-item" >
+          <i class="fa fa-cogs text-black-50"></i>
+
+          <span class="text-black-50">الاعدادات</span>
+        </button>
+        <button type="button" class="btn btn-sm text-danger dropdown-item" >
+          <i class="fa fa-lock m-1 text-black-50"></i>
+
+          <span class="text-black-50">شاشه القفل</span>
+        </button>
+        <button type="button" class="btn btn-sm text-danger dropdown-item" >
+          <i class="fa fa-sign-out text-black-50"></i>
+
+          <span class="text-black-50">تسجيل الخروج</span>
+        </button>
+      </div>
+    </li>
+
+  </ul>
+</nav>

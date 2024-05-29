@@ -1,0 +1,14 @@
+.custom-control-input:checked~.custom-control-label::before {
+  color: #fff;
+  border-color: #4CAF50;
+  background-color: #4CAF50;
+}
+.custom-switch {
+  padding-right: 1.25rem;
+}
+.custom-switch .custom-control-label::before {
+  left: -5.25rem;
+}
+.custom-switch .custom-control-label::after {
+  left: calc(-5.25rem + 2px);
+}

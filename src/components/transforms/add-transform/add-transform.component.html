@@ -1,0 +1,211 @@
+<app-search-bar id="search-container" class="hidden" [from]="'transformation'" [stockFrom]="addItemForm.get('stockIdFrom').value[0]?.value" (searchValue)="getValue($event)"></app-search-bar>
+
+<div class="jumbotron jumbotron-fluid">
+
+  <div class="page-container">
+    <div class="row">
+      <div class="col-sm-8">
+        <h4 class="text-store-lang">اضافه طلب تحويل</h4>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid filter-container">
+  <p class="text-muted">
+    <span class="small">قم بملئ الخانات الاتيه والتأكد من سلامه المعلومات المدخله والضغط علي حفظ </span><br>
+  </p>
+  <p class="small text-danger">قم بأختيار من مخزن اولا </p>
+  <div class="d-flex justify-content-center" *ngIf="!transformName">
+    <div class="spinner-border" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+  </div>
+
+    <div class="container p-2" style="flex-direction: column;" *ngIf="transformName">
+      <form (keydown.enter)="$event.preventDefault()" [formGroup]="addItemForm" id="addItemForm" (ngSubmit)="addItemSubmit()">
+        <div class="row">
+       <div class="col-sm-4">
+         <div class="form-group">
+           <label for="transformPermissionName" class="text-muted">رقم طلب التحويل
+           </label>
+           <input type="text" class="form-control" tabindex="-1" readonly [value]="transformName" formControlName="transformPermissionName" id="transformPermissionName" placeholder="رقم طلب التحويل">
+         </div>
+       </div>
+         <div class="col-sm-4">
+           <div class="form-group">
+             <label for="transformPermissionDate" class="text-muted">تاريخ الطلب
+               <span class="text-error">*</span>
+             </label>
+             <input type="text"
+                    placeholder="تاريخ الطلب"
+                    class="form-control"
+                    id="transformPermissionDate"
+                    bsDatepicker
+                    #dp=bsDatepicker
+                    [bsValue]="today"
+                    (focus)="dp.show()"
+                    readonly
+                    formControlName="transformPermissionDate" required>
+             <span class="text-error" *ngIf="addItemForm.get('transformPermissionDate').touched && addItemForm.get('transformPermissionDate').invalid">تاريخ الطلب مطلوب</span>
+           </div>
+         </div>
+
+
+
+
+         <div class="col-sm-4">
+           <div class="form-group">
+             <label for="stockIdFrom" class="text-muted">من مخزن
+               <span class="text-error">*</span>
+             </label>
+             <angular2-multiselect  [loading] = "loadingFrom" id="stockIdFrom"  (onScrollToEnd)="loadMoreStockFrom($event)"  *ngIf="allStoresFrom" [data]="allStoresFrom?.m_Item1" [settings]="dropdownSettings" (onSelect)="changeStockTo($event)" formControlName="stockIdFrom" (keyup.Tab)="focusStockFrom($event)" (onOpen)="checkStoreFromValue(addItemForm.get('stockIdFrom').value)" >
+               <c-search>
+                 <ng-template>
+                   <input type="text" (keyup)="onSearch($event)" [placeholder]="translate.currentLang === 'ar' ?  'كلمه البحث' : 'Search'"/>
+                 </ng-template>
+               </c-search>
+               <c-item>
+                 <ng-template let-item="item">
+                   <label>{{item.label}}</label>
+                 </ng-template>
+
+               </c-item>
+             </angular2-multiselect>
+             <span class="text-error" *ngIf="addItemForm.get('stockIdFrom').value.length === 0 && visitedFromStock">اسم المخزن مطلوب</span>
+
+
+           </div>
+         </div>
+
+        </div>
+        <div class="row p-2" *ngIf="addItemForm.get('stockIdFrom').value.length > 0">
+
+          <div style="width: 100%">
+            <table class="table table-bordered table-sm">
+              <thead>
+              <tr>
+                <th scope="col">
+                  كود الصنف</th>
+                <th scope="col">
+
+                  اسم الصنف
+                </th>
+                <th scope="col">
+                  الي مخزن</th>
+                <th scope="col" class="text-center" colspan="2">
+                  <span>الكميه</span><br>
+                  <span>الكرتونه</span>
+                  <span>/</span>
+                  <span>العدد</span>
+
+                </th>
+                <th scope="col">
+                  الاجراءات</th>
+              </tr>
+              </thead>
+              <tbody formArrayName="itemsDetails">
+              <ng-container *ngFor="let details of addItemForm.get('itemsDetails').controls; let i = index;" >
+                <tr [formGroupName]="i" [ngClass]="(details.get('errorRow').value === true || details.get('errorRows').value === true || details.get('duplicatedRow').value === true ||details.get('zeroRow').value === true) ? 'bg-danger' : 'bg-white'">
+                  <td class="column-divided-table">
+                    <div class="form-group">
+                      <input type="text" class="form-control" formControlName="ItemsCode_FK" placeholder="كود الصنف" (dblclick)="openSearchBar(i)" (focus)="currentEditIndex = i" (keyup.Tab)="currentEditIndex = i" (change)="getItemName(details.get('ItemsCode_FK').value, details.get('ItemsId_FK'), details.get('StockName_To_FK'), i)">
+                    </div>
+                    <span class="text-error" *ngIf="details.get('ItemsCode_FK').touched && details.get('ItemsCode_FK').invalid">كود الصنف مطلوب</span>
+                  </td>
+                  <td class="column-divided-table">
+                    <div class="form-group">
+                      <input *ngIf="translate.currentLang === 'ar'"  [ngStyle]="{'color': (details.get('StockName_To_FK')?.value?.indexOf('لا يوجد') <= -1 && details.get('StockName_To_FK')?.value?.indexOf('الكود غير صحيح') <= -1)  ? 'black' : 'red' }" class="form-control" disabled [value]="details.get('StockName_To_FK')?.value" formControlName="StockName_To_FK">
+                      <input *ngIf="translate.currentLang === 'en'" [ngStyle]="{'color': (details.get('StockName_To_FK')?.value?.indexOf('not found') <= -1 && details.get('StockName_To_FK')?.value?.indexOf('Incorrect Code') <= -1)  ? 'black' : 'red' }" class="form-control" disabled [value]="details.get('StockName_To_FK')?.value" formControlName="StockName_To_FK">
+                    </div>
+                  </td>
+                  <td class="column-divided-table">
+                    <div class="form-group">
+                      <angular2-multiselect  [loading] = "loadingTo" id="stockIdTo"  (onScrollToEnd)="loadMoreStockTo($event)"  *ngIf="allStoresTo" [data]="allStoresTo?.m_Item1" [settings]="(notFound === i) ? disabledOption : dropdownSettings" formControlName="StockId_To_FK" (keyup.Tab)="focusStockTo($event); currentEditIndex = i" (onOpen)="checkStoreToValue(details.get('StockId_To_FK'), i)" (onSelect)="checkDuplicated(details.get('StockId_To_FK')?.value[0]?.value, details.get('ItemsId_FK').value, i, addItemForm.get('stockIdFrom').value[0].value, details.get('TransformQuantityBox').value, details.get('TransformQuantityNumber').value)">
+                        <c-search>
+                          <ng-template>
+                            <input type="text" (keyup)="onSearchTo($event, i + 1)" [placeholder]="translate.currentLang === 'ar' ?  'كلمه البحث' : 'Search'"/>
+                          </ng-template>
+                        </c-search>
+                        <c-item>
+                          <ng-template let-item="item">
+                            <label>{{item.label}}</label>
+                          </ng-template>
+
+                        </c-item>
+                      </angular2-multiselect>
+                      <span class="text-error" *ngIf="details.get('StockId_To_FK')?.errors !== null && details.get('StockId_To_FK')?.errors === 'empty'">اسم المخزن مطلوب</span>
+
+                    </div>
+                  </td>
+                  <td class="column-divided">
+                    <input type="number" min="0" class="form-control" formControlName="TransformQuantityBox" required id="items-count" [readOnly]="(!(details.get('ItemsId_FK')?.value)  || details.get('duplicatedRow').value === true)" (change)="checkAvailabiltyQuantity(details.get('TransformQuantityBox').value, details.get('TransformQuantityNumber').value, details.get('ItemsId_FK').value, i)">
+                    <ng-container *ngIf="details.get('TransformQuantityBox').touched && details.get('TransformQuantityBox').errors">
+                    <span class="text-error" *ngIf="details.get('TransformQuantityBox').touched && details.get('TransformQuantityBox').errors.required">عدد العناصر مطلوب</span>
+                    <span class="text-error" *ngIf="details.get('TransformQuantityBox').errors.min">عدد العناصر لابد ان يكون رقم صحيح</span>
+                    </ng-container>
+                  </td>
+                  <td class="column-divided">
+                    <input type="number" min="0" class="form-control" formControlName="TransformQuantityNumber" required [readOnly]="(!(details.get('ItemsId_FK')?.value) || details.get('duplicatedRow').value === true)" (change)="checkAvailabiltyQuantity(details.get('TransformQuantityBox').value, details.get('TransformQuantityNumber').value, details.get('ItemsId_FK').value, i)">
+                    <ng-container *ngIf="details.get('TransformQuantityNumber').touched && details.get('TransformQuantityNumber').errors">
+                      <span class="text-error" *ngIf="details.get('TransformQuantityNumber').touched && details.get('TransformQuantityNumber').errors.required">عدد العناصر مطلوب</span>
+                      <span class="text-error" *ngIf="details.get('TransformQuantityNumber').errors.min">عدد العناصر لابد ان يكون رقم صحيح</span>
+                    </ng-container>
+                  </td>
+                  <td>
+                    <button *ngIf="details.get('ItemsCode_FK').touched" type="button" class="btn btn-sm btn-danger" (click)="removeItem(i)">
+                      <i class="fa fa-trash"></i>
+                      حذف
+                    </button>
+                  </td>
+                </tr>
+              </ng-container>
+              </tbody>
+            </table>
+          </div>
+
+
+
+        </div>
+      </form>
+      <div class="row" style="background-color: #dee2e6; padding: 10px;" *ngIf="addItemForm.get('stockIdFrom').value.length > 0">
+        <div class="col-sm-12 text-left">
+          <button type="submit" form="addItemForm" class="btn btn-success btn-sm" [disabled]="transformationItems.length === 0 || notFound !== -1">
+      <span>
+
+                حفظ
+      </span>
+          </button>
+          <button type="button" form="addItemForm" class="btn btn-danger btn-sm" [disabled]="!addItemForm.touched" [ngClass]="translate.currentLang === 'ar' ? 'mr-1' : 'ml-1'" (click)="resetForm()">
+      <span>
+
+                تفريغ
+      </span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+</div>
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="hint-store" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div><h5 class="modal-title text-center">تغيير المخزن</h5></div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="text-center">سيؤدي تغيير المخزن الي تفريغ جميع الخانات . هل انتا واثق من هذه الخطوه! </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success btn-sm" (click)="resetTransformation()">حفظ</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" (click)="prevFromStockId()">اغلاق</button>
+      </div>
+    </div>
+  </div>
+</div>
+

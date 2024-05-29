@@ -1,0 +1,6 @@
+@media (min-width: 576px){
+  #edit-item .modal-dialog {
+    max-width: 100%;
+    margin: 1.75rem auto;
+  }
+}
